@@ -8,6 +8,9 @@ import (
 type UserUsecase interface {
 	RegisterUser(user dto.UserCredential) (*entity.User, error)
 	LoginUser(email string, password string) (string, error)
-	UpdateUser(userID string, user dto.UserCredential) error
+	UpdateUser(userID string, user dto.UpdateUser) error
+	UpdateUserAvatar(userID, imageUrl string) error
+	FindUserByID(userID string) (*entity.User, error)
+	FindAllUser(page int, limit int, sortBy string, sortType string) (*[]entity.User, error)
 	DeleteUser(userID string) error
 }

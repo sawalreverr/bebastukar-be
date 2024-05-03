@@ -13,6 +13,7 @@ type User struct {
 	PhoneNumber string `json:"phone_number"`
 	Role        string `json:"role"`
 	ImageURL    string `json:"image_url"`
+	Bio         string `json:"bio"`
 	Password    string `json:"password"`
 
 	CreatedAt time.Time      `json:"-"`

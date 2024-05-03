@@ -9,15 +9,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sawalreverr/bebastukar-be/config"
 	"github.com/sawalreverr/bebastukar-be/internal/database"
-	"github.com/sawalreverr/bebastukar-be/internal/handler"
-	"github.com/sawalreverr/bebastukar-be/internal/repository"
-	"github.com/sawalreverr/bebastukar-be/internal/usecase"
 )
 
 type echoServer struct {
 	app  *echo.Echo
 	db   database.Database
 	conf *config.Config
+	gr   *echo.Group
 }
 
 type CustomValidator struct {
@@ -32,10 +30,13 @@ func NewEchoServer(conf *config.Config, db database.Database) Server {
 	app := echo.New()
 	app.Validator = &CustomValidator{validator: validator.New()}
 
+	group := app.Group("/api/v1")
+
 	return &echoServer{
 		app:  app,
 		db:   db,
 		conf: conf,
+		gr:   group,
 	}
 }
 
@@ -48,21 +49,15 @@ func (s *echoServer) Start() {
 		return c.String(http.StatusOK, "OK")
 	})
 
+	// Public
+	s.publicHttpHandler()
+
 	// Authenticate
 	s.authHttpHandler()
 
+	// User
+	s.userHttpHandler()
+
 	serverPORT := fmt.Sprintf(":%d", s.conf.Server.Port)
 	s.app.Logger.Fatal(s.app.Start(serverPORT))
-}
-
-func (s *echoServer) authHttpHandler() {
-	// Depedency
-	userRepository := repository.NewUserRepository(s.db)
-	userUsecase := usecase.NewUserUsecase(userRepository)
-	authHandler := handler.NewAuthHandler(userUsecase)
-
-	// Route
-	auth := s.app.Group("/api/v1")
-	auth.POST("/register", authHandler.RegisterHandler)
-	auth.POST("/login", authHandler.LoginHandler)
 }
