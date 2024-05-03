@@ -1,5 +1,6 @@
 server:
   port: 8080
+  jwtsecret: <your_secret>
 
 db:
   host: <your_host>
