@@ -11,15 +11,15 @@ import (
 	"github.com/sawalreverr/bebastukar-be/pkg"
 )
 
-type userHandler struct {
+type authHandler struct {
 	userUsecase usecase.UserUsecase
 }
 
-func NewUserHandler(uc usecase.UserUsecase) UserHandler {
-	return &userHandler{userUsecase: uc}
+func NewAuthHandler(uc usecase.UserUsecase) AuthHandler {
+	return &authHandler{userUsecase: uc}
 }
 
-func (h *userHandler) RegisterHandler(c echo.Context) error {
+func (h *authHandler) RegisterHandler(c echo.Context) error {
 	var userRequest dto.UserCredential
 
 	if err := c.Bind(&userRequest); err != nil {
@@ -55,7 +55,7 @@ func (h *userHandler) RegisterHandler(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
-func (h *userHandler) LoginHandler(c echo.Context) error {
+func (h *authHandler) LoginHandler(c echo.Context) error {
 	var userRequest dto.Login
 
 	if err := c.Bind(&userRequest); err != nil {
