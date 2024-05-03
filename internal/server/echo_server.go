@@ -49,23 +49,20 @@ func (s *echoServer) Start() {
 	})
 
 	// Authenticate
-	s.userHttpHandler()
+	s.authHttpHandler()
 
 	serverPORT := fmt.Sprintf(":%d", s.conf.Server.Port)
 	s.app.Logger.Fatal(s.app.Start(serverPORT))
 }
 
-func (s *echoServer) userHttpHandler() {
+func (s *echoServer) authHttpHandler() {
 	// Depedency
 	userRepository := repository.NewUserRepository(s.db)
 	userUsecase := usecase.NewUserUsecase(userRepository)
-	userHandler := handler.NewUserHandler(userUsecase)
+	authHandler := handler.NewAuthHandler(userUsecase)
 
 	// Route
-	auth := s.app.Group("/auth")
-	auth.GET("", func(c echo.Context) error {
-		return c.String(200, "Authenticate Page!")
-	})
-	auth.POST("/register", userHandler.RegisterHandler)
-	auth.POST("/login", userHandler.LoginHandler)
+	auth := s.app.Group("/api/v1")
+	auth.POST("/register", authHandler.RegisterHandler)
+	auth.POST("/login", authHandler.LoginHandler)
 }
