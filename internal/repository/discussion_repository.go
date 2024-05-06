@@ -40,21 +40,21 @@ func (r *discussionRepository) DeleteDiscussion(discussionID string, userID stri
 }
 
 func (r *discussionRepository) FindDiscussionByID(discussionID string) (*entity.Discussions, error) {
-	var discussion *entity.Discussions
+	var discussion entity.Discussions
 	if err := r.DB.GetDB().Where("id = ?", discussionID).First(&discussion).Error; err != nil {
 		return nil, err
 	}
 
-	return discussion, nil
+	return &discussion, nil
 }
 
 func (r *discussionRepository) FindDiscussionByUserID(userID string) (*[]entity.Discussions, error) {
-	var userDiscussions *[]entity.Discussions
+	var userDiscussions []entity.Discussions
 	if err := r.DB.GetDB().Where("user_id = ?", userID).Find(&userDiscussions).Error; err != nil {
 		return nil, err
 	}
 
-	return userDiscussions, nil
+	return &userDiscussions, nil
 }
 
 func (r *discussionRepository) FindAllDiscussion() (*[]entity.Discussions, error) {
@@ -75,7 +75,7 @@ func (r *discussionRepository) AddImage(discussionImage entity.DiscussionImages)
 }
 
 func (r *discussionRepository) DeleteImage(discussionImageID string, discussionID string) error {
-	var discussionImage *entity.DiscussionImages
+	var discussionImage entity.DiscussionImages
 	if err := r.DB.GetDB().Where("id = ? AND discussion_id = ?", discussionImageID, discussionID).Delete(&discussionImage).Error; err != nil {
 		return err
 	}
@@ -83,14 +83,19 @@ func (r *discussionRepository) DeleteImage(discussionImageID string, discussionI
 	return nil
 }
 
-func (r *discussionRepository) FindAllImage(discussionID string) (*[]entity.DiscussionImages, error) {
-	var discussionImages *[]entity.DiscussionImages
+func (r *discussionRepository) FindAllImage(discussionID string) (*[]string, error) {
+	var discussionImages []entity.DiscussionImages
+	var imageURLs []string
 
 	if err := r.DB.GetDB().Where("discussion_id = ?", discussionID).Find(&discussionImages).Error; err != nil {
 		return nil, err
 	}
 
-	return discussionImages, nil
+	for _, discusImage := range discussionImages {
+		imageURLs = append(imageURLs, discusImage.ImageURL)
+	}
+
+	return &imageURLs, nil
 }
 
 // Discussion Comment Repository
@@ -111,7 +116,7 @@ func (r *discussionRepository) UpdateComment(comment entity.DiscussionComments) 
 }
 
 func (r *discussionRepository) DeleteComment(discussionCommentID string, discussionID string, userID string) error {
-	var discussionComment *entity.DiscussionComments
+	var discussionComment entity.DiscussionComments
 	if err := r.DB.GetDB().Where("id = ? AND discussion_id = ? AND user_id = ?", discussionCommentID, discussionID, userID).Delete(&discussionComment).Error; err != nil {
 		return err
 	}
@@ -120,12 +125,12 @@ func (r *discussionRepository) DeleteComment(discussionCommentID string, discuss
 }
 
 func (r *discussionRepository) FindAllComment(discussionID string) (*[]entity.DiscussionComments, error) {
-	var discussionComments *[]entity.DiscussionComments
+	var discussionComments []entity.DiscussionComments
 	if err := r.DB.GetDB().Where("discussion_id = ?", discussionID).Find(&discussionComments).Error; err != nil {
 		return nil, err
 	}
 
-	return discussionComments, nil
+	return &discussionComments, nil
 }
 
 // Discussion Reply Comment Repository
@@ -146,7 +151,7 @@ func (r *discussionRepository) UpdateReplyComment(replyComment entity.Discussion
 }
 
 func (r *discussionRepository) DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, userID string) error {
-	var discussionReplyComment *entity.DiscussionReplyComments
+	var discussionReplyComment entity.DiscussionReplyComments
 	if err := r.DB.GetDB().Where("id = ? AND discussion_comment_id = ? AND user_id = ?", discussionReplyCommentID, discussionCommentID, userID).Delete(&discussionReplyComment).Error; err != nil {
 		return err
 	}
@@ -155,10 +160,10 @@ func (r *discussionRepository) DeleteReplyComment(discussionReplyCommentID strin
 }
 
 func (r *discussionRepository) FindAllReplyComment(discussionCommentID string) (*[]entity.DiscussionReplyComments, error) {
-	var discussionReplyComments *[]entity.DiscussionReplyComments
+	var discussionReplyComments []entity.DiscussionReplyComments
 	if err := r.DB.GetDB().Where("discussion_comment_id = ?", discussionCommentID).Find(&discussionReplyComments).Error; err != nil {
 		return nil, err
 	}
 
-	return discussionReplyComments, nil
+	return &discussionReplyComments, nil
 }
