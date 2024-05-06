@@ -10,3 +10,30 @@ type UserRepository interface {
 	Update(user *entity.User) error
 	Delete(userID string) error
 }
+
+type DiscussionRepository interface {
+	// Discussion
+	CreateDiscussion(discussion entity.Discussions) (*entity.Discussions, error)
+	UpdateDiscussion(discussion entity.Discussions) error
+	DeleteDiscussion(discussionID string, userID string) error
+	FindDiscussionByID(discussionID string) (*entity.Discussions, error)
+	FindDiscussionByUserID(userID string) (*[]entity.Discussions, error)
+	FindAllDiscussion() (*[]entity.Discussions, error)
+
+	// Discussion Image
+	AddImage(discussionImage entity.DiscussionImages) (*entity.DiscussionImages, error)
+	DeleteImage(discussionImageID string, discussionID string) error
+	FindAllImage(discussionID string) (*[]entity.DiscussionImages, error)
+
+	// Discussion Comment
+	AddComment(comment entity.DiscussionComments) (*entity.DiscussionComments, error)
+	UpdateComment(comment entity.DiscussionComments) error
+	DeleteComment(discussionCommentID string, discussionID string, userID string) error
+	FindAllComment(discussionID string) (*[]entity.DiscussionComments, error)
+
+	// Discussion Reply Comment
+	AddReplyComment(replyComment entity.DiscussionReplyComments) (*entity.DiscussionReplyComments, error)
+	UpdateReplyComment(replyComment entity.DiscussionReplyComments) error
+	DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, userID string) error
+	FindAllReplyComment(discussionCommentID string) (*[]entity.DiscussionReplyComments, error)
+}
