@@ -14,3 +14,11 @@ type UserUsecase interface {
 	FindAllUser(page int, limit int, sortBy string, sortType string) (*[]entity.User, error)
 	DeleteUser(userID string) error
 }
+
+type DiscussionUsecase interface {
+	CreateDiscussion(discussion dto.DiscussionCredential) (*dto.DiscussionResponse, error)
+	EditDiscussion(discussionID string, discussion dto.DiscussionCredential) error
+	DeleteDiscussion(discussionID string) error
+	GetAllDiscussionFromUser(userID string) (*[]dto.DiscussionResponse, error)
+	GetDiscussionFromID(discussionID string) (*dto.DiscussionResponse, error)
+}
