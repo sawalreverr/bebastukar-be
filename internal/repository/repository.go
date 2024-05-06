@@ -23,6 +23,7 @@ type DiscussionRepository interface {
 	// Discussion Image
 	AddImage(discussionImage entity.DiscussionImages) (*entity.DiscussionImages, error)
 	DeleteImage(discussionImageID string, discussionID string) error
+	DeleteAllImage(discussionID string) error
 	FindAllImage(discussionID string) (*[]string, error)
 
 	// Discussion Comment

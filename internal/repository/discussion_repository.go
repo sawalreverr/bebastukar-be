@@ -83,6 +83,14 @@ func (r *discussionRepository) DeleteImage(discussionImageID string, discussionI
 	return nil
 }
 
+func (r *discussionRepository) DeleteAllImage(discussionID string) error {
+	if err := r.DB.GetDB().Where("discussion_id = ?", discussionID).Delete(&entity.DiscussionImages{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *discussionRepository) FindAllImage(discussionID string) (*[]string, error) {
 	var discussionImages []entity.DiscussionImages
 	var imageURLs []string

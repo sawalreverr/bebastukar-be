@@ -79,6 +79,11 @@ func (u *discussionUsecase) DeleteDiscussion(discussionID string) error {
 		return pkg.ErrStatusInternalError
 	}
 
+	err = u.discussionRepository.DeleteAllImage(discussionFound.ID)
+	if err != nil {
+		return pkg.ErrStatusInternalError
+	}
+
 	return nil
 }
 
