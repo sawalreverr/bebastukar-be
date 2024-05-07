@@ -8,13 +8,24 @@ import (
 )
 
 func (s *echoServer) publicHttpHandler() {
-	// Depedency
+	// Depedency user
 	userRepository := repository.NewUserRepository(s.db)
 	userUsecase := usecase.NewUserUsecase(userRepository)
 	userHandler := handler.NewUserHandler(userUsecase)
 
+	// Dependency discussion
+	discussionRepository := repository.NewDiscussionRepository(s.db)
+	discussionUsecase := usecase.NewDiscussionUsecase(discussionRepository)
+	discussionHandler := handler.NewDiscussionHandler(discussionUsecase)
+
 	// Find user by id
 	s.gr.GET("/users/:id", userHandler.FindUser)
+
+	// Find discussion by id
+	s.gr.GET("/discussion/:id", discussionHandler.FindDiscussionByID)
+
+	// Find all discussion from user
+	s.gr.GET("/discussion/user/:userid", discussionHandler.FindAllDiscussionUserHandler)
 }
 
 func (s *echoServer) authHttpHandler() {
@@ -39,4 +50,18 @@ func (s *echoServer) userHttpHandler() {
 	user.GET("/users/profile", userHandler.ProfileGet)
 	user.POST("/users/profile", userHandler.ProfileUpdate)
 	user.POST("/users/uploadAvatar", userHandler.UploadAvatar)
+}
+
+func (s *echoServer) discussionHttpHandler() {
+	// Dependecy
+	discussionRepository := repository.NewDiscussionRepository(s.db)
+	discussionUsecase := usecase.NewDiscussionUsecase(discussionRepository)
+	discussionHandler := handler.NewDiscussionHandler(discussionUsecase)
+
+	// Router
+	discussion := s.gr.Group("", middleware.JWTMiddleware)
+	discussion.GET("/discussion", discussionHandler.GetAllDiscussionFromProfile)
+	discussion.POST("/discussion", discussionHandler.NewDiscussionHandler)
+	discussion.PUT("/discussion/:id", discussionHandler.EditDiscussionhandler)
+	discussion.DELETE("/discussion/:id", discussionHandler.DeleteDiscussionhandler)
 }

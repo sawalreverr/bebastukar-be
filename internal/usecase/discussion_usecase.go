@@ -42,6 +42,7 @@ func (u *discussionUsecase) CreateDiscussion(discussion dto.DiscussionCredential
 	}
 
 	discussionResponse := dto.DiscussionResponse{
+		ID:        dataDiscussion.ID,
 		AuthorID:  dataDiscussion.UserID,
 		Content:   dataDiscussion.Content,
 		Images:    discussion.Images,
@@ -57,7 +58,7 @@ func (u *discussionUsecase) EditDiscussion(discussionID string, discussion dto.D
 		return pkg.ErrRecordNotFound
 	}
 
-	// only edit content, for images im too lazy :D
+	// only edit content
 	discussionFound.Content = discussion.Content
 
 	err = u.discussionRepository.UpdateDiscussion(*discussionFound)
@@ -96,6 +97,7 @@ func (u *discussionUsecase) GetAllDiscussionFromUser(userID string) (*[]dto.Disc
 	var discussions []dto.DiscussionResponse
 	for _, discus := range *discussionFound {
 		data := dto.DiscussionResponse{
+			ID:        discus.ID,
 			AuthorID:  discus.UserID,
 			Content:   discus.Content,
 			CreatedAt: discus.CreatedAt,
@@ -120,6 +122,7 @@ func (u *discussionUsecase) GetDiscussionFromID(discussionID string) (*dto.Discu
 	}
 
 	data := dto.DiscussionResponse{
+		ID:        discussionFound.ID,
 		AuthorID:  discussionFound.UserID,
 		Content:   discussionFound.Content,
 		CreatedAt: discussionFound.CreatedAt,

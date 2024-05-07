@@ -43,6 +43,7 @@ func NewEchoServer(conf *config.Config, db database.Database) Server {
 func (s *echoServer) Start() {
 	s.app.Use(middleware.Recover())
 	s.app.Use(middleware.Logger())
+	s.app.Use(middleware.CORS())
 
 	// Healthy Check
 	s.app.GET("/health", func(c echo.Context) error {
@@ -57,6 +58,9 @@ func (s *echoServer) Start() {
 
 	// User
 	s.userHttpHandler()
+
+	// Discussion
+	s.discussionHttpHandler()
 
 	serverPORT := fmt.Sprintf(":%d", s.conf.Server.Port)
 	s.app.Logger.Fatal(s.app.Start(serverPORT))

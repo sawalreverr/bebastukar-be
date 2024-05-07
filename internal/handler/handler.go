@@ -13,3 +13,12 @@ type UserHandler interface {
 	UploadAvatar(c echo.Context) error
 	FindUser(c echo.Context) error
 }
+
+type DiscussionHandler interface {
+	GetAllDiscussionFromProfile(c echo.Context) error
+	NewDiscussionHandler(c echo.Context) error
+	EditDiscussionhandler(c echo.Context) error
+	DeleteDiscussionhandler(c echo.Context) error
+	FindAllDiscussionUserHandler(c echo.Context) error
+	FindDiscussionByID(c echo.Context) error
+}
