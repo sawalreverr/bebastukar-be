@@ -131,10 +131,6 @@ func (u *discussionUsecase) GetDiscussionFromID(discussionID string) (*dto.Discu
 		UpdatedAt: discussionFound.UpdatedAt,
 	}
 
-	// if imageURLs != nil {
-	// 	data.Images = *imageURLs
-	// }
-
 	return &data, nil
 }
 
@@ -172,4 +168,175 @@ func (u *discussionUsecase) GetAllDiscussion(page int, limit int, sortBy string,
 	}
 
 	return &paginationResponse, nil
+}
+
+func (u *discussionUsecase) CreateCommentDiscussion(comment dto.DiscussionCommentCredential) (*dto.DiscussionCommentResponse, error) {
+	discussionFound, err := u.discussionRepository.FindDiscussionByID(comment.DiscussionID)
+	if err != nil {
+		return nil, pkg.ErrDiscussionNotFound
+	}
+
+	newComment := entity.DiscussionComments{
+		ID:           uuid.NewString(),
+		DiscussionID: discussionFound.ID,
+		UserID:       comment.AuthorID,
+		Comment:      comment.Comment,
+	}
+
+	dataComment, err := u.discussionRepository.AddComment(newComment)
+	if err != nil {
+		return nil, pkg.ErrStatusInternalError
+	}
+
+	commentResponse := dto.DiscussionCommentResponse{
+		ID:           dataComment.ID,
+		AuthorID:     dataComment.UserID,
+		DiscussionID: dataComment.DiscussionID,
+		Comment:      dataComment.Comment,
+		CreatedAt:    dataComment.CreatedAt,
+	}
+
+	return &commentResponse, nil
+}
+
+func (u *discussionUsecase) EditCommentDiscussion(discussionCommentID string, comment dto.DiscussionCommentCredential) error {
+	_, err := u.discussionRepository.FindDiscussionByID(comment.DiscussionID)
+	if err != nil {
+		return pkg.ErrDiscussionNotFound
+	}
+
+	commentFound, err := u.discussionRepository.FindCommentByID(discussionCommentID)
+	if err != nil {
+		return pkg.ErrCommentNotFound
+	}
+
+	commentFound.Comment = comment.Comment
+
+	if commentFound.UserID != comment.AuthorID {
+		return pkg.ErrNoPrivilege
+	}
+
+	err = u.discussionRepository.UpdateComment(*commentFound)
+	if err != nil {
+		return pkg.ErrStatusInternalError
+	}
+
+	return nil
+}
+
+func (u *discussionUsecase) DeleteCommentDiscussion(discussionID string, discussionCommentID string, userID string) error {
+	discussionFound, err := u.discussionRepository.FindDiscussionByID(discussionID)
+	if err != nil {
+		return pkg.ErrDiscussionNotFound
+	}
+
+	commentFound, err := u.discussionRepository.FindCommentByID(discussionCommentID)
+	if err != nil {
+		return pkg.ErrCommentNotFound
+	}
+
+	if commentFound.UserID != userID {
+		return pkg.ErrNoPrivilege
+	}
+
+	err = u.discussionRepository.DeleteComment(commentFound.ID, discussionFound.ID, userID)
+	if err != nil {
+		return pkg.ErrStatusInternalError
+	}
+
+	return nil
+}
+
+func (u *discussionUsecase) CreateReplyCommentDiscussion(replyComment dto.DiscussionReplyCommentCredential) (*dto.DiscussionReplyCommentResponse, error) {
+	discussionFound, err := u.discussionRepository.FindDiscussionByID(replyComment.DiscussionID)
+	if err != nil {
+		return nil, pkg.ErrDiscussionNotFound
+	}
+
+	commentFound, err := u.discussionRepository.FindCommentByID(replyComment.DiscussionCommentID)
+	if err != nil {
+		return nil, pkg.ErrCommentNotFound
+	}
+
+	newReplyComment := entity.DiscussionReplyComments{
+		ID:                  uuid.NewString(),
+		DiscussionCommentID: commentFound.ID,
+		DiscussionID:        discussionFound.ID,
+		UserID:              replyComment.AuthorID,
+		Comment:             replyComment.ReplyComment,
+	}
+
+	dataReplyComment, err := u.discussionRepository.AddReplyComment(newReplyComment)
+	if err != nil {
+		return nil, pkg.ErrStatusInternalError
+	}
+
+	replyCommentResponse := dto.DiscussionReplyCommentResponse{
+		ID:                  dataReplyComment.ID,
+		AuthorID:            dataReplyComment.UserID,
+		DiscussionID:        dataReplyComment.DiscussionID,
+		DiscussionCommentID: dataReplyComment.DiscussionCommentID,
+		ReplyComment:        dataReplyComment.Comment,
+		CreatedAt:           dataReplyComment.CreatedAt,
+	}
+
+	return &replyCommentResponse, nil
+}
+
+func (u *discussionUsecase) EditReplyCommentDiscussion(discussionReplyCommentID string, replyComment dto.DiscussionReplyCommentCredential) error {
+	_, err := u.discussionRepository.FindDiscussionByID(replyComment.DiscussionID)
+	if err != nil {
+		return pkg.ErrDiscussionNotFound
+	}
+
+	_, err = u.discussionRepository.FindCommentByID(replyComment.DiscussionCommentID)
+	if err != nil {
+		return pkg.ErrCommentNotFound
+	}
+
+	replyCommentFound, err := u.discussionRepository.FindReplyCommentByID(discussionReplyCommentID)
+	if err != nil {
+		return pkg.ErrReplyCommentNotFound
+	}
+
+	if replyCommentFound.UserID != replyComment.AuthorID {
+		return pkg.ErrNoPrivilege
+	}
+
+	replyCommentFound.Comment = replyComment.ReplyComment
+
+	err = u.discussionRepository.UpdateReplyComment(*replyCommentFound)
+	if err != nil {
+		return pkg.ErrStatusInternalError
+	}
+
+	return nil
+}
+
+func (u *discussionUsecase) DeleteReplyCommentDiscussion(discussionID string, discussionCommentID string, discussionReplyCommentID string, userID string) error {
+	_, err := u.discussionRepository.FindDiscussionByID(discussionID)
+	if err != nil {
+		return pkg.ErrDiscussionNotFound
+	}
+
+	_, err = u.discussionRepository.FindCommentByID(discussionCommentID)
+	if err != nil {
+		return pkg.ErrCommentNotFound
+	}
+
+	replyCommentFound, err := u.discussionRepository.FindReplyCommentByID(discussionReplyCommentID)
+	if err != nil {
+		return pkg.ErrReplyCommentNotFound
+	}
+
+	if replyCommentFound.UserID != userID {
+		return pkg.ErrNoPrivilege
+	}
+
+	err = u.discussionRepository.DeleteReplyComment(replyCommentFound.ID, replyCommentFound.DiscussionCommentID, replyCommentFound.DiscussionID, replyCommentFound.UserID)
+	if err != nil {
+		return pkg.ErrStatusInternalError
+	}
+
+	return nil
 }

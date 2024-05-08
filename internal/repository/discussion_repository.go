@@ -167,6 +167,15 @@ func (r *discussionRepository) FindAllComment(discussionID string) (*[]entity.Di
 	return &discussionComments, nil
 }
 
+func (r *discussionRepository) FindCommentByID(discussionCommentID string) (*entity.DiscussionComments, error) {
+	var discussionComment entity.DiscussionComments
+	if err := r.DB.GetDB().Where("id = ?", discussionCommentID).First(&discussionComment).Error; err != nil {
+		return nil, err
+	}
+
+	return &discussionComment, nil
+}
+
 // Discussion Reply Comment Repository
 func (r *discussionRepository) AddReplyComment(replyComment entity.DiscussionReplyComments) (*entity.DiscussionReplyComments, error) {
 	if err := r.DB.GetDB().Create(&replyComment).Error; err != nil {
@@ -184,9 +193,9 @@ func (r *discussionRepository) UpdateReplyComment(replyComment entity.Discussion
 	return nil
 }
 
-func (r *discussionRepository) DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, userID string) error {
+func (r *discussionRepository) DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, discussionID string, userID string) error {
 	var discussionReplyComment entity.DiscussionReplyComments
-	if err := r.DB.GetDB().Where("id = ? AND discussion_comment_id = ? AND user_id = ?", discussionReplyCommentID, discussionCommentID, userID).Delete(&discussionReplyComment).Error; err != nil {
+	if err := r.DB.GetDB().Where("id = ? AND discussion_comment_id = ? AND discussion_id = ? AND user_id = ?", discussionReplyCommentID, discussionCommentID, discussionID, userID).Delete(&discussionReplyComment).Error; err != nil {
 		return err
 	}
 
@@ -200,4 +209,13 @@ func (r *discussionRepository) FindAllReplyComment(discussionCommentID string) (
 	}
 
 	return &discussionReplyComments, nil
+}
+
+func (r *discussionRepository) FindReplyCommentByID(discussionReplyCommentID string) (*entity.DiscussionReplyComments, error) {
+	var discussionReplyComment entity.DiscussionReplyComments
+	if err := r.DB.GetDB().Where("id = ?", discussionReplyCommentID).First(&discussionReplyComment).Error; err != nil {
+		return nil, err
+	}
+
+	return &discussionReplyComment, nil
 }

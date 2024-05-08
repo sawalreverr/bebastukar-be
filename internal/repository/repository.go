@@ -32,10 +32,12 @@ type DiscussionRepository interface {
 	UpdateComment(comment entity.DiscussionComments) error
 	DeleteComment(discussionCommentID string, discussionID string, userID string) error
 	FindAllComment(discussionID string) (*[]entity.DiscussionComments, error)
+	FindCommentByID(discussionCommentID string) (*entity.DiscussionComments, error)
 
 	// Discussion Reply Comment
 	AddReplyComment(replyComment entity.DiscussionReplyComments) (*entity.DiscussionReplyComments, error)
 	UpdateReplyComment(replyComment entity.DiscussionReplyComments) error
-	DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, userID string) error
+	DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, discussionID string, userID string) error
 	FindAllReplyComment(discussionCommentID string) (*[]entity.DiscussionReplyComments, error)
+	FindReplyCommentByID(discussionReplyCommentID string) (*entity.DiscussionReplyComments, error)
 }

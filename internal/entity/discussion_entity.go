@@ -39,6 +39,7 @@ type DiscussionComments struct {
 
 type DiscussionReplyComments struct {
 	ID                  string `json:"id" gorm:"primaryKey"`
+	DiscussionID        string `json:"discussion_id"`
 	DiscussionCommentID string `json:"discussion_comment_id"`
 	UserID              string `json:"user_id"`
 	Comment             string `json:"comment"`

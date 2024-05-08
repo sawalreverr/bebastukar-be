@@ -12,8 +12,16 @@ type DiscussionCredential struct {
 }
 
 type DiscussionCommentCredential struct {
-	AuthorID string `json:"author_id"`
-	Content  string `json:"content"`
+	AuthorID     string `json:"author_id"`
+	DiscussionID string `json:"discussion_id"`
+	Comment      string `json:"comment"`
+}
+
+type DiscussionReplyCommentCredential struct {
+	AuthorID            string `json:"author_id"`
+	DiscussionID        string `json:"discussion_id"`
+	DiscussionCommentID string `json:"discussion_comment_id"`
+	ReplyComment        string `json:"reply_comment"`
 }
 
 type DiscussionResponse struct {
@@ -26,11 +34,22 @@ type DiscussionResponse struct {
 }
 
 type DiscussionCommentResponse struct {
-	ID        string    `json:"id"`
-	AuthorID  string    `json:"author_id"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	ID           string    `json:"id"`
+	AuthorID     string    `json:"author_id"`
+	DiscussionID string    `json:"discussion_id"`
+	Comment      string    `json:"comment"`
+	CreatedAt    time.Time `json:"created_at,omitempty"`
+	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+}
+
+type DiscussionReplyCommentResponse struct {
+	ID                  string    `json:"id"`
+	AuthorID            string    `json:"author_id"`
+	DiscussionID        string    `json:"discussion_id"`
+	DiscussionCommentID string    `json:"discussion_comment_id"`
+	ReplyComment        string    `json:"reply_comment"`
+	CreatedAt           time.Time `json:"created_at,omitempty"`
+	UpdatedAt           time.Time `json:"updated_at,omitempty"`
 }
 
 type DiscussionPaginationResponse struct {
@@ -43,4 +62,8 @@ type DiscussionPaginationResponse struct {
 type DiscussionInput struct {
 	Content string                  `form:"content" validate:"required,min=1,max=500"`
 	Images  []*multipart.FileHeader `form:"images"`
+}
+
+type DiscussionCommentInput struct {
+	Comment string `form:"comment" validate:"required,min=1,max=500"`
 }
