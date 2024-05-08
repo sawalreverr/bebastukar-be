@@ -106,7 +106,7 @@ func (u *discussionUsecase) GetAllDiscussionFromUser(userID string) (*[]dto.Disc
 
 		images, _ := u.discussionRepository.FindAllImage(discus.ID)
 		if images != nil {
-			data.Images = *images
+			data.Images = images
 		}
 
 		discussions = append(discussions, data)
@@ -121,18 +121,55 @@ func (u *discussionUsecase) GetDiscussionFromID(discussionID string) (*dto.Discu
 		return nil, pkg.ErrRecordNotFound
 	}
 
+	imageURLs, _ := u.discussionRepository.FindAllImage(discussionFound.ID)
 	data := dto.DiscussionResponse{
 		ID:        discussionFound.ID,
 		AuthorID:  discussionFound.UserID,
 		Content:   discussionFound.Content,
+		Images:    imageURLs,
 		CreatedAt: discussionFound.CreatedAt,
 		UpdatedAt: discussionFound.UpdatedAt,
 	}
 
-	imageURLs, _ := u.discussionRepository.FindAllImage(discussionFound.ID)
-	if imageURLs != nil {
-		data.Images = *imageURLs
-	}
+	// if imageURLs != nil {
+	// 	data.Images = *imageURLs
+	// }
 
 	return &data, nil
+}
+
+func (u *discussionUsecase) GetAllDiscussion(page int, limit int, sortBy string, sortType string) (*dto.DiscussionPaginationResponse, error) {
+	var discussionResponses []dto.DiscussionResponse
+	discussions, err := u.discussionRepository.FindAllDiscussion(page, limit, sortBy, sortType)
+	if err != nil {
+		return nil, pkg.ErrStatusInternalError
+	}
+
+	totalCount, err := u.discussionRepository.CountAllDiscussions()
+	if err != nil {
+		return nil, pkg.ErrStatusInternalError
+	}
+
+	for _, discuss := range *discussions {
+		imageURLs, _ := u.discussionRepository.FindAllImage(discuss.ID)
+
+		discussResp := dto.DiscussionResponse{
+			ID:        discuss.ID,
+			AuthorID:  discuss.UserID,
+			Content:   discuss.Content,
+			Images:    imageURLs,
+			CreatedAt: discuss.CreatedAt,
+			UpdatedAt: discuss.UpdatedAt,
+		}
+		discussionResponses = append(discussionResponses, discussResp)
+	}
+
+	paginationResponse := dto.DiscussionPaginationResponse{
+		TotalCount:  totalCount,
+		Page:        page,
+		Limit:       limit,
+		Discussions: discussionResponses,
+	}
+
+	return &paginationResponse, nil
 }

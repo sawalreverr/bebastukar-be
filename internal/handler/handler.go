@@ -19,6 +19,8 @@ type DiscussionHandler interface {
 	NewDiscussionHandler(c echo.Context) error
 	EditDiscussionhandler(c echo.Context) error
 	DeleteDiscussionhandler(c echo.Context) error
+
 	FindAllDiscussionUserHandler(c echo.Context) error
 	FindDiscussionByID(c echo.Context) error
+	FindAllDiscussion(c echo.Context) error
 }

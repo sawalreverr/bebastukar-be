@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/sawalreverr/bebastukar-be/internal/database"
 	"github.com/sawalreverr/bebastukar-be/internal/entity"
 )
@@ -57,12 +59,32 @@ func (r *discussionRepository) FindDiscussionByUserID(userID string) (*[]entity.
 	return &userDiscussions, nil
 }
 
-func (r *discussionRepository) FindAllDiscussion() (*[]entity.Discussions, error) {
-	// TODO
-	// FIND ALL DISCUSSION WITH LIMIT OFFSET
-	// var discussions *[]entity.Discussions
+func (r *discussionRepository) FindAllDiscussion(page int, limit int, sortBy string, sortType string) (*[]entity.Discussions, error) {
+	var discussions *[]entity.Discussions
 
-	return nil, nil
+	db := r.DB.GetDB()
+	offset := (page - 1) * limit
+
+	if sortBy != "" {
+		sort := fmt.Sprintf("%s %s", sortBy, sortType)
+		db = db.Order(sort)
+	}
+
+	if err := db.Offset(offset).Limit(limit).Find(&discussions).Error; err != nil {
+		return nil, err
+	}
+
+	return discussions, nil
+}
+
+func (r *discussionRepository) CountAllDiscussions() (int, error) {
+	var totalCount int64
+
+	if err := r.DB.GetDB().Model(&entity.Discussions{}).Count(&totalCount).Error; err != nil {
+		return 0, err
+	}
+
+	return int(totalCount), nil
 }
 
 // Discussion Image Repository
@@ -91,7 +113,7 @@ func (r *discussionRepository) DeleteAllImage(discussionID string) error {
 	return nil
 }
 
-func (r *discussionRepository) FindAllImage(discussionID string) (*[]string, error) {
+func (r *discussionRepository) FindAllImage(discussionID string) ([]string, error) {
 	var discussionImages []entity.DiscussionImages
 	var imageURLs []string
 
@@ -103,7 +125,11 @@ func (r *discussionRepository) FindAllImage(discussionID string) (*[]string, err
 		imageURLs = append(imageURLs, discusImage.ImageURL)
 	}
 
-	return &imageURLs, nil
+	if len(imageURLs) == 0 {
+		return []string{}, nil
+	}
+
+	return imageURLs, nil
 }
 
 // Discussion Comment Repository

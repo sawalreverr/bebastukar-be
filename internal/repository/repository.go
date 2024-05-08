@@ -18,13 +18,14 @@ type DiscussionRepository interface {
 	DeleteDiscussion(discussionID string, userID string) error
 	FindDiscussionByID(discussionID string) (*entity.Discussions, error)
 	FindDiscussionByUserID(userID string) (*[]entity.Discussions, error)
-	FindAllDiscussion() (*[]entity.Discussions, error)
+	FindAllDiscussion(page int, limit int, sortBy string, sortType string) (*[]entity.Discussions, error)
+	CountAllDiscussions() (int, error)
 
 	// Discussion Image
 	AddImage(discussionImage entity.DiscussionImages) (*entity.DiscussionImages, error)
 	DeleteImage(discussionImageID string, discussionID string) error
 	DeleteAllImage(discussionID string) error
-	FindAllImage(discussionID string) (*[]string, error)
+	FindAllImage(discussionID string) ([]string, error)
 
 	// Discussion Comment
 	AddComment(comment entity.DiscussionComments) (*entity.DiscussionComments, error)

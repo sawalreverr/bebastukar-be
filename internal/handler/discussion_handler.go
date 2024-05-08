@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sawalreverr/bebastukar-be/internal/dto"
@@ -72,7 +73,7 @@ func (h *discussionHandler) NewDiscussionHandler(c echo.Context) error {
 		return helper.ErrorHandler(c, http.StatusInternalServerError, "internal server error")
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseData(http.StatusCreated, "discussion created!", response))
+	return c.JSON(http.StatusCreated, helper.ResponseData(http.StatusCreated, "discussion created!", response))
 }
 
 func (h *discussionHandler) EditDiscussionhandler(c echo.Context) error {
@@ -140,4 +141,33 @@ func (h *discussionHandler) FindAllDiscussionUserHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, helper.ResponseData(http.StatusOK, "found!", discussionFound))
+}
+
+func (h *discussionHandler) FindAllDiscussion(c echo.Context) error {
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	if page == 0 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	if limit == 0 {
+		limit = 10
+	}
+	sortBy := c.QueryParam("sort_by")
+	sortType := c.QueryParam("sort_type")
+
+	if sortBy == "" {
+		sortBy = "created_at"
+		sortType = "desc"
+	}
+
+	if sortType == "" {
+		sortType = "asc"
+	}
+
+	discussionResponse, err := h.disccusionUsecase.GetAllDiscussion(page, limit, sortBy, sortType)
+	if err != nil {
+		return helper.ErrorHandler(c, http.StatusInternalServerError, "internal server error")
+	}
+
+	return c.JSON(http.StatusOK, helper.ResponseData(http.StatusOK, "OK", discussionResponse))
 }

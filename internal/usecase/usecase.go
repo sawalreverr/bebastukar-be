@@ -21,4 +21,5 @@ type DiscussionUsecase interface {
 	DeleteDiscussion(discussionID string) error
 	GetAllDiscussionFromUser(userID string) (*[]dto.DiscussionResponse, error)
 	GetDiscussionFromID(discussionID string) (*dto.DiscussionResponse, error)
+	GetAllDiscussion(page int, limit int, sortBy string, sortType string) (*dto.DiscussionPaginationResponse, error)
 }

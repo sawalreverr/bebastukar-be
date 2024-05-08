@@ -26,6 +26,9 @@ func (s *echoServer) publicHttpHandler() {
 
 	// Find all discussion from user
 	s.gr.GET("/discussion/user/:userid", discussionHandler.FindAllDiscussionUserHandler)
+
+	// Find all discussion pagination
+	s.gr.GET("/discussions", discussionHandler.FindAllDiscussion)
 }
 
 func (s *echoServer) authHttpHandler() {
