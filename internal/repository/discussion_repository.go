@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/sawalreverr/bebastukar-be/internal/database"
 	"github.com/sawalreverr/bebastukar-be/internal/entity"
 )
@@ -57,12 +59,32 @@ func (r *discussionRepository) FindDiscussionByUserID(userID string) (*[]entity.
 	return &userDiscussions, nil
 }
 
-func (r *discussionRepository) FindAllDiscussion() (*[]entity.Discussions, error) {
-	// TODO
-	// FIND ALL DISCUSSION WITH LIMIT OFFSET
-	// var discussions *[]entity.Discussions
+func (r *discussionRepository) FindAllDiscussion(page int, limit int, sortBy string, sortType string) (*[]entity.Discussions, error) {
+	var discussions *[]entity.Discussions
 
-	return nil, nil
+	db := r.DB.GetDB()
+	offset := (page - 1) * limit
+
+	if sortBy != "" {
+		sort := fmt.Sprintf("%s %s", sortBy, sortType)
+		db = db.Order(sort)
+	}
+
+	if err := db.Offset(offset).Limit(limit).Find(&discussions).Error; err != nil {
+		return nil, err
+	}
+
+	return discussions, nil
+}
+
+func (r *discussionRepository) CountAllDiscussions() (int, error) {
+	var totalCount int64
+
+	if err := r.DB.GetDB().Model(&entity.Discussions{}).Count(&totalCount).Error; err != nil {
+		return 0, err
+	}
+
+	return int(totalCount), nil
 }
 
 // Discussion Image Repository
@@ -91,7 +113,7 @@ func (r *discussionRepository) DeleteAllImage(discussionID string) error {
 	return nil
 }
 
-func (r *discussionRepository) FindAllImage(discussionID string) (*[]string, error) {
+func (r *discussionRepository) FindAllImage(discussionID string) ([]string, error) {
 	var discussionImages []entity.DiscussionImages
 	var imageURLs []string
 
@@ -103,7 +125,11 @@ func (r *discussionRepository) FindAllImage(discussionID string) (*[]string, err
 		imageURLs = append(imageURLs, discusImage.ImageURL)
 	}
 
-	return &imageURLs, nil
+	if len(imageURLs) == 0 {
+		return []string{}, nil
+	}
+
+	return imageURLs, nil
 }
 
 // Discussion Comment Repository
@@ -141,6 +167,15 @@ func (r *discussionRepository) FindAllComment(discussionID string) (*[]entity.Di
 	return &discussionComments, nil
 }
 
+func (r *discussionRepository) FindCommentByID(discussionCommentID string) (*entity.DiscussionComments, error) {
+	var discussionComment entity.DiscussionComments
+	if err := r.DB.GetDB().Where("id = ?", discussionCommentID).First(&discussionComment).Error; err != nil {
+		return nil, err
+	}
+
+	return &discussionComment, nil
+}
+
 // Discussion Reply Comment Repository
 func (r *discussionRepository) AddReplyComment(replyComment entity.DiscussionReplyComments) (*entity.DiscussionReplyComments, error) {
 	if err := r.DB.GetDB().Create(&replyComment).Error; err != nil {
@@ -158,9 +193,9 @@ func (r *discussionRepository) UpdateReplyComment(replyComment entity.Discussion
 	return nil
 }
 
-func (r *discussionRepository) DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, userID string) error {
+func (r *discussionRepository) DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, discussionID string, userID string) error {
 	var discussionReplyComment entity.DiscussionReplyComments
-	if err := r.DB.GetDB().Where("id = ? AND discussion_comment_id = ? AND user_id = ?", discussionReplyCommentID, discussionCommentID, userID).Delete(&discussionReplyComment).Error; err != nil {
+	if err := r.DB.GetDB().Where("id = ? AND discussion_comment_id = ? AND discussion_id = ? AND user_id = ?", discussionReplyCommentID, discussionCommentID, discussionID, userID).Delete(&discussionReplyComment).Error; err != nil {
 		return err
 	}
 
@@ -174,4 +209,13 @@ func (r *discussionRepository) FindAllReplyComment(discussionCommentID string) (
 	}
 
 	return &discussionReplyComments, nil
+}
+
+func (r *discussionRepository) FindReplyCommentByID(discussionReplyCommentID string) (*entity.DiscussionReplyComments, error) {
+	var discussionReplyComment entity.DiscussionReplyComments
+	if err := r.DB.GetDB().Where("id = ?", discussionReplyCommentID).First(&discussionReplyComment).Error; err != nil {
+		return nil, err
+	}
+
+	return &discussionReplyComment, nil
 }

@@ -25,7 +25,13 @@ func (s *echoServer) publicHttpHandler() {
 	s.gr.GET("/discussion/:id", discussionHandler.FindDiscussionByID)
 
 	// Find all discussion from user
-	s.gr.GET("/discussion/user/:userid", discussionHandler.FindAllDiscussionUserHandler)
+	s.gr.GET("/discussion/user/:userID", discussionHandler.FindAllDiscussionUserHandler)
+
+	// Find all discussion pagination
+	s.gr.GET("/discussions", discussionHandler.FindAllDiscussion)
+
+	// Find all discussion comment
+	s.gr.GET("/discussion/:id/:commentID", discussionHandler.FindAllDiscussionCommentHandler)
 }
 
 func (s *echoServer) authHttpHandler() {
@@ -47,8 +53,13 @@ func (s *echoServer) userHttpHandler() {
 
 	// Router
 	user := s.gr.Group("", middleware.JWTMiddleware)
+<<<<<<< HEAD
 	user.GET("/users/profile", userHandler.ProfileGet)
 	user.PUT("/users/profile", userHandler.ProfileUpdate)
+=======
+	user.GET("/users", userHandler.ProfileGet)
+	user.POST("/users", userHandler.ProfileUpdate)
+>>>>>>> feature/discussion
 	user.POST("/users/uploadAvatar", userHandler.UploadAvatar)
 }
 
@@ -58,10 +69,20 @@ func (s *echoServer) discussionHttpHandler() {
 	discussionUsecase := usecase.NewDiscussionUsecase(discussionRepository)
 	discussionHandler := handler.NewDiscussionHandler(discussionUsecase)
 
-	// Router
+	// Discussion Router
 	discussion := s.gr.Group("", middleware.JWTMiddleware)
 	discussion.GET("/discussion", discussionHandler.GetAllDiscussionFromProfile)
 	discussion.POST("/discussion", discussionHandler.NewDiscussionHandler)
 	discussion.PUT("/discussion/:id", discussionHandler.EditDiscussionhandler)
 	discussion.DELETE("/discussion/:id", discussionHandler.DeleteDiscussionhandler)
+
+	// Discussion Comment Router
+	discussion.POST("/discussion/:id/comment", discussionHandler.AddDiscussionCommentHandler)
+	discussion.PUT("/discussion/:id/:commentID", discussionHandler.EditDiscussionCommentHandler)
+	discussion.DELETE("/discussion/:id/:commentID", discussionHandler.DeleteDiscussionCommentHandler)
+
+	// Discussion Reply Comment Router
+	discussion.POST("/discussion/:id/:commentID/reply", discussionHandler.AddDiscussionReplyCommentHandler)
+	discussion.PUT("/discussion/:id/:commentID/:replyCommentID", discussionHandler.EditDiscussionReplyCommentHandler)
+	discussion.DELETE("/discussion/:id/:commentID/:replyCommentID", discussionHandler.DeleteDiscussionReplyCommentHandler)
 }

@@ -15,10 +15,25 @@ type UserHandler interface {
 }
 
 type DiscussionHandler interface {
+	// Discussion handler
 	GetAllDiscussionFromProfile(c echo.Context) error
 	NewDiscussionHandler(c echo.Context) error
 	EditDiscussionhandler(c echo.Context) error
 	DeleteDiscussionhandler(c echo.Context) error
+
+	// Discussion finder handler
 	FindAllDiscussionUserHandler(c echo.Context) error
 	FindDiscussionByID(c echo.Context) error
+	FindAllDiscussion(c echo.Context) error
+
+	// Discussion comment handler
+	AddDiscussionCommentHandler(c echo.Context) error
+	EditDiscussionCommentHandler(c echo.Context) error
+	DeleteDiscussionCommentHandler(c echo.Context) error
+	FindAllDiscussionCommentHandler(c echo.Context) error
+
+	// Discussion reply comment handler
+	AddDiscussionReplyCommentHandler(c echo.Context) error
+	EditDiscussionReplyCommentHandler(c echo.Context) error
+	DeleteDiscussionReplyCommentHandler(c echo.Context) error
 }

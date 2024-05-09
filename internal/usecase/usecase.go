@@ -16,9 +16,30 @@ type UserUsecase interface {
 }
 
 type DiscussionUsecase interface {
+	// Discussion
 	CreateDiscussion(discussion dto.DiscussionCredential) (*dto.DiscussionResponse, error)
 	EditDiscussion(discussionID string, discussion dto.DiscussionCredential) error
 	DeleteDiscussion(discussionID string) error
+
+	// Discussion Find
 	GetAllDiscussionFromUser(userID string) (*[]dto.DiscussionResponse, error)
 	GetDiscussionFromID(discussionID string) (*dto.DiscussionResponse, error)
+	GetAllDiscussion(page int, limit int, sortBy string, sortType string) (*dto.DiscussionPaginationResponse, error)
+
+	// Discussion Comment
+	CreateCommentDiscussion(comment dto.DiscussionCommentCredential) (*dto.DiscussionCommentResponse, error)
+	EditCommentDiscussion(discussionCommentID string, comment dto.DiscussionCommentCredential) error
+	DeleteCommentDiscussion(discussionID string, discussionCommentID string, userID string) error
+
+	// Discussion Comment Find
+	GetAllCommentFromDiscussion(discussionID string) (*[]dto.DiscussionCommentResponse, error)
+	GetAllCommentFromDiscussionPublic(discussionID string, discussionCommentID string) (*[]dto.DiscussionCommentResponse, error)
+
+	// Discussion Reply Comment
+	CreateReplyCommentDiscussion(replyComment dto.DiscussionReplyCommentCredential) (*dto.DiscussionReplyCommentResponse, error)
+	EditReplyCommentDiscussion(discussionReplyCommentID string, replyComment dto.DiscussionReplyCommentCredential) error
+	DeleteReplyCommentDiscussion(discussionID string, discussionCommentID string, discussionReplyCommentID string, userID string) error
+
+	// Discussion Reply Comment Find
+	GetAllReplyCommentFromComment(discussionCommentID string) (*[]dto.DiscussionReplyCommentResponse, error)
 }
