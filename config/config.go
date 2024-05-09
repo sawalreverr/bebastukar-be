@@ -6,8 +6,9 @@ import (
 
 type (
 	Config struct {
-		Server *Server
-		DB     *DB
+		Server     *Server
+		DB         *DB
+		Cloudinary *Cloudinary
 	}
 
 	Server struct {
@@ -21,6 +22,12 @@ type (
 		User     string
 		Password string
 		DBName   string
+	}
+
+	Cloudinary struct {
+		CloudName string
+		ApiKey    string
+		ApiSecret string
 	}
 )
 

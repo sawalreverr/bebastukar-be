@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/sawalreverr/bebastukar-be/internal/database"
 	"github.com/sawalreverr/bebastukar-be/internal/entity"
 )
@@ -39,17 +41,26 @@ func (r *userRepository) FindByID(userID string) (*entity.User, error) {
 	return user, nil
 }
 
-func (r *userRepository) FindAll() (*[]entity.User, error) {
+func (r *userRepository) FindAll(page int, limit int, sortBy string, sortType string) (*[]entity.User, error) {
 	var users *[]entity.User
-	if err := r.DB.GetDB().Find(&users).Error; err != nil {
+
+	db := r.DB.GetDB()
+	offset := (page - 1) * limit
+
+	if sortBy != "" {
+		sort := fmt.Sprintf("%s %s", sortBy, sortType)
+		db = db.Order(sort)
+	}
+
+	if err := db.Offset(offset).Limit(limit).Find(&users).Error; err != nil {
 		return nil, err
 	}
 
 	return users, nil
 }
 
-func (r *userRepository) Update(userID string, user entity.User) error {
-	if err := r.DB.GetDB().Where("id = ?", userID).Save(&user).Error; err != nil {
+func (r *userRepository) Update(user *entity.User) error {
+	if err := r.DB.GetDB().Save(&user).Error; err != nil {
 		return err
 	}
 

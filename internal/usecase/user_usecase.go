@@ -60,23 +60,44 @@ func (u *userUsecase) LoginUser(email string, password string) (string, error) {
 	return token, err
 }
 
-func (u *userUsecase) UpdateUser(userID string, user dto.UserCredential) error {
-	var err error
-
-	_, err = u.userRepository.FindByID(userID)
+func (u *userUsecase) UpdateUser(userID string, user dto.UpdateUser) error {
+	userFound, err := u.userRepository.FindByID(userID)
 
 	if err != nil {
 		return err
 	}
 
-	userCred := entity.User{
-		Name:        user.Name,
-		PhoneNumber: user.PhoneNumber,
+	userFound.Name = user.Name
+	userFound.PhoneNumber = user.PhoneNumber
+	userFound.Bio = user.Bio
+
+	err = u.userRepository.Update(userFound)
+	return err
+}
+
+func (u *userUsecase) UpdateUserAvatar(userID, imageUrl string) error {
+	userFound, err := u.userRepository.FindByID(userID)
+
+	if err != nil {
+		return err
 	}
 
-	err = u.userRepository.Update(userID, userCred)
+	userFound.ImageURL = imageUrl
 
+	err = u.userRepository.Update(userFound)
 	return err
+}
+
+func (u *userUsecase) FindUserByID(userID string) (*entity.User, error) {
+	userFound, err := u.userRepository.FindByID(userID)
+
+	return userFound, err
+}
+
+func (u *userUsecase) FindAllUser(page int, limit int, sortBy string, sortType string) (*[]entity.User, error) {
+	users, err := u.userRepository.FindAll(page, limit, sortBy, sortType)
+
+	return users, err
 }
 
 func (u *userUsecase) DeleteUser(userID string) error {

@@ -1,25 +1,23 @@
 package dto
 
-type UserCredential struct {
+import "mime/multipart"
+
+type UpdateUser struct {
 	Name        string `json:"name" validate:"required,min=2"`
-	Email       string `json:"email" validate:"required,email"`
 	PhoneNumber string `json:"phone_number" validate:"required,min=10"`
-	Password    string `json:"password" validate:"required,min=8"`
+	Bio         string `json:"bio"`
 }
 
-type Login struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
-}
-
-type RegisterResponse struct {
+type ProfileUser struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
-	PhoneNumber string `json:"phone_number"`
 	Email       string `json:"email"`
+	PhoneNumber string `json:"phone_number"`
+	Role        string `json:"role"`
+	ImageURL    string `json:"image_url"`
+	Bio         string `json:"bio"`
 }
 
-type LoginResponse struct {
-	Email string `json:"email"`
-	Token string `json:"token"`
+type AvatarUpload struct {
+	Image *multipart.File `form:"image" validate:"required,image"`
 }

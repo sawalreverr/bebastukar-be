@@ -7,7 +7,13 @@ import (
 )
 
 func AutoMigrate(db Database) {
-	if err := db.GetDB().AutoMigrate(&entity.User{}); err != nil {
+	if err := db.GetDB().AutoMigrate(
+		&entity.User{},
+		&entity.Discussions{},
+		&entity.DiscussionImages{},
+		&entity.DiscussionComments{},
+		&entity.DiscussionReplyComments{},
+	); err != nil {
 		log.Fatal("Database Migration Failed!")
 	}
 

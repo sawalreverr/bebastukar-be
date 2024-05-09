@@ -1,5 +1,6 @@
 server:
   port: 8080
+  jwtsecret: <your_secret>
 
 db:
   host: <your_host>
@@ -7,3 +8,8 @@ db:
   user: <your_user>
   password: <your_password>
   dbname: <your_dbname>
+
+cloudinary:
+  cloudname: <your_cloudname>
+  apikey: <your_apikey>
+  apisecret: <your_apisecret>
