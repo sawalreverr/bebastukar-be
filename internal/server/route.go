@@ -53,13 +53,8 @@ func (s *echoServer) userHttpHandler() {
 
 	// Router
 	user := s.gr.Group("", middleware.JWTMiddleware)
-<<<<<<< HEAD
-	user.GET("/users/profile", userHandler.ProfileGet)
-	user.PUT("/users/profile", userHandler.ProfileUpdate)
-=======
 	user.GET("/users", userHandler.ProfileGet)
 	user.POST("/users", userHandler.ProfileUpdate)
->>>>>>> feature/discussion
 	user.POST("/users/uploadAvatar", userHandler.UploadAvatar)
 }
 
