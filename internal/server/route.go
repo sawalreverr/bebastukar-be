@@ -54,7 +54,7 @@ func (s *echoServer) userHttpHandler() {
 	// Router
 	user := s.gr.Group("", middleware.JWTMiddleware)
 	user.GET("/users", userHandler.ProfileGet)
-	user.POST("/users", userHandler.ProfileUpdate)
+	user.PUT("/users", userHandler.ProfileUpdate)
 	user.POST("/users/uploadAvatar", userHandler.UploadAvatar)
 }
 
