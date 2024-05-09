@@ -30,6 +30,7 @@ type DiscussionHandler interface {
 	AddDiscussionCommentHandler(c echo.Context) error
 	EditDiscussionCommentHandler(c echo.Context) error
 	DeleteDiscussionCommentHandler(c echo.Context) error
+	FindAllDiscussionCommentHandler(c echo.Context) error
 
 	// Discussion reply comment handler
 	AddDiscussionReplyCommentHandler(c echo.Context) error

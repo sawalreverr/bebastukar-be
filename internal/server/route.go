@@ -29,6 +29,9 @@ func (s *echoServer) publicHttpHandler() {
 
 	// Find all discussion pagination
 	s.gr.GET("/discussions", discussionHandler.FindAllDiscussion)
+
+	// Find all discussion comment
+	s.gr.GET("/discussion/:id/:commentID", discussionHandler.FindAllDiscussionCommentHandler)
 }
 
 func (s *echoServer) authHttpHandler() {
@@ -70,11 +73,11 @@ func (s *echoServer) discussionHttpHandler() {
 
 	// Discussion Comment Router
 	discussion.POST("/discussion/:id/comment", discussionHandler.AddDiscussionCommentHandler)
-	discussion.PUT("/discussion/:id/comment/:commentID", discussionHandler.EditDiscussionCommentHandler)
-	discussion.DELETE("/discussion/:id/comment/:commentID", discussionHandler.DeleteDiscussionCommentHandler)
+	discussion.PUT("/discussion/:id/:commentID", discussionHandler.EditDiscussionCommentHandler)
+	discussion.DELETE("/discussion/:id/:commentID", discussionHandler.DeleteDiscussionCommentHandler)
 
 	// Discussion Reply Comment Router
-	discussion.POST("/discussion/:id/comment/:commentID/reply", discussionHandler.AddDiscussionReplyCommentHandler)
-	discussion.PUT("/discussion/:id/comment/:commentID/reply/:replyCommentID", discussionHandler.EditDiscussionReplyCommentHandler)
-	discussion.DELETE("/discussion/:id/comment/:commentID/reply/:replyCommentID", discussionHandler.DeleteDiscussionReplyCommentHandler)
+	discussion.POST("/discussion/:id/:commentID/reply", discussionHandler.AddDiscussionReplyCommentHandler)
+	discussion.PUT("/discussion/:id/:commentID/:replyCommentID", discussionHandler.EditDiscussionReplyCommentHandler)
+	discussion.DELETE("/discussion/:id/:commentID/:replyCommentID", discussionHandler.DeleteDiscussionReplyCommentHandler)
 }

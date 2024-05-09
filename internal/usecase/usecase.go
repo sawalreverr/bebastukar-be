@@ -31,8 +31,15 @@ type DiscussionUsecase interface {
 	EditCommentDiscussion(discussionCommentID string, comment dto.DiscussionCommentCredential) error
 	DeleteCommentDiscussion(discussionID string, discussionCommentID string, userID string) error
 
+	// Discussion Comment Find
+	GetAllCommentFromDiscussion(discussionID string) (*[]dto.DiscussionCommentResponse, error)
+	GetAllCommentFromDiscussionPublic(discussionID string, discussionCommentID string) (*[]dto.DiscussionCommentResponse, error)
+
 	// Discussion Reply Comment
 	CreateReplyCommentDiscussion(replyComment dto.DiscussionReplyCommentCredential) (*dto.DiscussionReplyCommentResponse, error)
 	EditReplyCommentDiscussion(discussionReplyCommentID string, replyComment dto.DiscussionReplyCommentCredential) error
 	DeleteReplyCommentDiscussion(discussionID string, discussionCommentID string, discussionReplyCommentID string, userID string) error
+
+	// Discussion Reply Comment Find
+	GetAllReplyCommentFromComment(discussionCommentID string) (*[]dto.DiscussionReplyCommentResponse, error)
 }

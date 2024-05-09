@@ -243,6 +243,18 @@ func (h *discussionHandler) DeleteDiscussionCommentHandler(c echo.Context) error
 	return c.JSON(http.StatusOK, helper.ResponseData(http.StatusOK, "comment deleted!", nil))
 }
 
+func (h *discussionHandler) FindAllDiscussionCommentHandler(c echo.Context) error {
+	discussionID := c.Param("id")
+	discussionCommentID := c.Param("commentID")
+
+	response, err := h.disccusionUsecase.GetAllCommentFromDiscussionPublic(discussionID, discussionCommentID)
+	if err != nil {
+		return pkg.DiscussionErrorHelper(c, err)
+	}
+
+	return c.JSON(http.StatusOK, helper.ResponseData(http.StatusOK, "ok", response))
+}
+
 func (h *discussionHandler) AddDiscussionReplyCommentHandler(c echo.Context) error {
 	var replyCommentData dto.DiscussionCommentInput
 

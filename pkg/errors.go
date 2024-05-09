@@ -24,23 +24,13 @@ var (
 func DiscussionErrorHelper(c echo.Context, err error) error {
 	var errorResponse string
 
-	if errors.Is(err, ErrDiscussionNotFound) {
-		errorResponse = err.Error()
-	}
-
-	if errors.Is(err, ErrCommentNotFound) {
-		errorResponse = err.Error()
-	}
-
-	if errors.Is(err, ErrReplyCommentNotFound) {
-		errorResponse = err.Error()
-	}
-
-	if errors.Is(err, ErrNoPrivilege) {
-		errorResponse = err.Error()
-	}
-
-	if errors.Is(err, ErrStatusInternalError) {
+	switch {
+	case errors.Is(err, ErrDiscussionNotFound),
+		errors.Is(err, ErrCommentNotFound),
+		errors.Is(err, ErrReplyCommentNotFound),
+		errors.Is(err, ErrNoPrivilege),
+		errors.Is(err, ErrStatusInternalError),
+		errors.Is(err, ErrRecordNotFound):
 		errorResponse = err.Error()
 	}
 

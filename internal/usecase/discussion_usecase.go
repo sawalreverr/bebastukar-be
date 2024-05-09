@@ -96,17 +96,24 @@ func (u *discussionUsecase) GetAllDiscussionFromUser(userID string) (*[]dto.Disc
 
 	var discussions []dto.DiscussionResponse
 	for _, discus := range *discussionFound {
+		images, _ := u.discussionRepository.FindAllImage(discus.ID)
+		comments, _ := u.GetAllCommentFromDiscussion(discus.ID)
+
+		var limitedComments []dto.DiscussionCommentResponse
+		if len(*comments) > 2 {
+			limitedComments = (*comments)[:2]
+		} else {
+			limitedComments = *comments
+		}
+
 		data := dto.DiscussionResponse{
 			ID:        discus.ID,
 			AuthorID:  discus.UserID,
 			Content:   discus.Content,
+			Images:    images,
+			Comment:   limitedComments,
 			CreatedAt: discus.CreatedAt,
 			UpdatedAt: discus.UpdatedAt,
-		}
-
-		images, _ := u.discussionRepository.FindAllImage(discus.ID)
-		if images != nil {
-			data.Images = images
 		}
 
 		discussions = append(discussions, data)
@@ -122,11 +129,14 @@ func (u *discussionUsecase) GetDiscussionFromID(discussionID string) (*dto.Discu
 	}
 
 	imageURLs, _ := u.discussionRepository.FindAllImage(discussionFound.ID)
+	comments, _ := u.GetAllCommentFromDiscussion(discussionFound.ID)
+
 	data := dto.DiscussionResponse{
 		ID:        discussionFound.ID,
 		AuthorID:  discussionFound.UserID,
 		Content:   discussionFound.Content,
 		Images:    imageURLs,
+		Comment:   *comments,
 		CreatedAt: discussionFound.CreatedAt,
 		UpdatedAt: discussionFound.UpdatedAt,
 	}
@@ -148,12 +158,21 @@ func (u *discussionUsecase) GetAllDiscussion(page int, limit int, sortBy string,
 
 	for _, discuss := range *discussions {
 		imageURLs, _ := u.discussionRepository.FindAllImage(discuss.ID)
+		comments, _ := u.GetAllCommentFromDiscussion(discuss.ID)
+
+		var limitedComments []dto.DiscussionCommentResponse
+		if len(*comments) > 2 {
+			limitedComments = (*comments)[:2]
+		} else {
+			limitedComments = *comments
+		}
 
 		discussResp := dto.DiscussionResponse{
 			ID:        discuss.ID,
 			AuthorID:  discuss.UserID,
 			Content:   discuss.Content,
 			Images:    imageURLs,
+			Comment:   limitedComments,
 			CreatedAt: discuss.CreatedAt,
 			UpdatedAt: discuss.UpdatedAt,
 		}
@@ -245,6 +264,79 @@ func (u *discussionUsecase) DeleteCommentDiscussion(discussionID string, discuss
 	}
 
 	return nil
+}
+
+func (u *discussionUsecase) GetAllCommentFromDiscussion(discussionID string) (*[]dto.DiscussionCommentResponse, error) {
+	var response []dto.DiscussionCommentResponse
+	comments, err := u.discussionRepository.FindAllComment(discussionID)
+	if err != nil {
+		return nil, pkg.ErrCommentNotFound
+	}
+
+	for _, comment := range *comments {
+		replys, _ := u.GetAllReplyCommentFromComment(comment.ID)
+
+		var limitedReplyComments []dto.DiscussionReplyCommentResponse
+		if len(*replys) > 2 {
+			limitedReplyComments = (*replys)[:2]
+		} else {
+			limitedReplyComments = *replys
+		}
+
+		commentResp := dto.DiscussionCommentResponse{
+			ID:           comment.ID,
+			AuthorID:     comment.UserID,
+			DiscussionID: comment.DiscussionID,
+			Comment:      comment.Comment,
+			ReplyComment: limitedReplyComments,
+			CreatedAt:    comment.CreatedAt,
+			UpdatedAt:    comment.UpdatedAt,
+		}
+
+		response = append(response, commentResp)
+	}
+
+	if len(response) == 0 {
+		response = []dto.DiscussionCommentResponse{}
+	}
+
+	return &response, nil
+}
+
+func (u *discussionUsecase) GetAllCommentFromDiscussionPublic(discussionID string, discussionCommentID string) (*[]dto.DiscussionCommentResponse, error) {
+	var response []dto.DiscussionCommentResponse
+	_, err := u.discussionRepository.FindDiscussionByID(discussionID)
+	if err != nil {
+		return nil, pkg.ErrDiscussionNotFound
+	}
+
+	_, err = u.discussionRepository.FindCommentByID(discussionCommentID)
+	if err != nil {
+		return nil, pkg.ErrCommentNotFound
+	}
+
+	comments, err := u.discussionRepository.FindAllComment(discussionID)
+	if err != nil {
+		return nil, pkg.ErrStatusInternalError
+	}
+
+	for _, comment := range *comments {
+		replys, _ := u.GetAllReplyCommentFromComment(comment.ID)
+
+		commentResp := dto.DiscussionCommentResponse{
+			ID:           comment.ID,
+			AuthorID:     comment.UserID,
+			DiscussionID: comment.DiscussionID,
+			Comment:      comment.Comment,
+			ReplyComment: *replys,
+			CreatedAt:    comment.CreatedAt,
+			UpdatedAt:    comment.UpdatedAt,
+		}
+
+		response = append(response, commentResp)
+	}
+
+	return &response, nil
 }
 
 func (u *discussionUsecase) CreateReplyCommentDiscussion(replyComment dto.DiscussionReplyCommentCredential) (*dto.DiscussionReplyCommentResponse, error) {
@@ -339,4 +431,31 @@ func (u *discussionUsecase) DeleteReplyCommentDiscussion(discussionID string, di
 	}
 
 	return nil
+}
+
+func (u *discussionUsecase) GetAllReplyCommentFromComment(discussionCommentID string) (*[]dto.DiscussionReplyCommentResponse, error) {
+	var response []dto.DiscussionReplyCommentResponse
+	comments, err := u.discussionRepository.FindAllReplyComment(discussionCommentID)
+	if err != nil {
+		return nil, pkg.ErrCommentNotFound
+	}
+
+	for _, comment := range *comments {
+		commentResp := dto.DiscussionReplyCommentResponse{
+			ID:           comment.ID,
+			AuthorID:     comment.UserID,
+			DiscussionID: comment.DiscussionID,
+			ReplyComment: comment.Comment,
+			CreatedAt:    comment.CreatedAt,
+			UpdatedAt:    comment.UpdatedAt,
+		}
+
+		response = append(response, commentResp)
+	}
+
+	if len(response) == 0 {
+		response = []dto.DiscussionReplyCommentResponse{}
+	}
+
+	return &response, nil
 }
