@@ -29,10 +29,7 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		})
 
 		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				return helper.ErrorHandler(c, http.StatusUnauthorized, "Invalid token signature")
-			}
-			return helper.ErrorHandler(c, http.StatusInternalServerError, "Internal server error")
+			return helper.ErrorHandler(c, http.StatusUnauthorized, "Invalid token signature")
 		}
 
 		if claims, ok := token.Claims.(*helper.JwtCustomClaims); ok && next != nil {

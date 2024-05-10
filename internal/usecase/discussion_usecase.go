@@ -95,6 +95,11 @@ func (u *discussionUsecase) GetAllDiscussionFromUser(userID string) (*[]dto.Disc
 	}
 
 	var discussions []dto.DiscussionResponse
+
+	if len(*discussionFound) == 0 {
+		return &discussions, nil
+	}
+
 	for _, discus := range *discussionFound {
 		images, _ := u.discussionRepository.FindAllImage(discus.ID)
 		comments, _ := u.GetAllCommentFromDiscussion(discus.ID)

@@ -23,25 +23,21 @@ func (h *authHandler) RegisterHandler(c echo.Context) error {
 	var userRequest dto.UserCredential
 
 	if err := c.Bind(&userRequest); err != nil {
-		bindErr := helper.ResponseData(http.StatusBadRequest, err.Error(), nil)
-		return c.JSON(http.StatusBadRequest, bindErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "bind error!")
 	}
 
-	if err := c.Validate(userRequest); err != nil {
-		validateErr := helper.ResponseData(http.StatusBadRequest, err.Error(), nil)
-		return c.JSON(http.StatusBadRequest, validateErr)
+	if err := c.Validate(&userRequest); err != nil {
+		return helper.ErrorHandler(c, http.StatusBadRequest, "validation error!")
 	}
 
 	newUser, err := h.userUsecase.RegisterUser(userRequest)
 
 	if err != nil {
 		if errors.Is(err, pkg.ErrDataAlreadyExist) {
-			emailExist := helper.ResponseData(http.StatusConflict, "email already registered!", nil)
-			return c.JSON(http.StatusConflict, emailExist)
+			return helper.ErrorHandler(c, http.StatusConflict, "email already registered!")
 		}
 
-		internalErr := helper.ResponseData(http.StatusInternalServerError, err.Error(), nil)
-		return c.JSON(http.StatusInternalServerError, internalErr)
+		return helper.ErrorHandler(c, http.StatusInternalServerError, "internal server error!")
 	}
 
 	responseUser := dto.RegisterResponse{
@@ -51,7 +47,7 @@ func (h *authHandler) RegisterHandler(c echo.Context) error {
 		Email:       newUser.Email,
 	}
 
-	response := helper.ResponseData(http.StatusCreated, "Register Successfully!", responseUser)
+	response := helper.ResponseData(http.StatusCreated, "register successfully!", responseUser)
 	return c.JSON(http.StatusCreated, response)
 }
 
@@ -59,25 +55,21 @@ func (h *authHandler) LoginHandler(c echo.Context) error {
 	var userRequest dto.Login
 
 	if err := c.Bind(&userRequest); err != nil {
-		bindErr := helper.ResponseData(http.StatusBadRequest, err.Error(), nil)
-		return c.JSON(http.StatusBadRequest, bindErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "bind error!")
 	}
 
 	if err := c.Validate(&userRequest); err != nil {
-		validateErr := helper.ResponseData(http.StatusBadRequest, err.Error(), nil)
-		return c.JSON(http.StatusBadRequest, validateErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "validation error!")
 	}
 
 	token, err := h.userUsecase.LoginUser(userRequest.Email, userRequest.Password)
 
 	if err != nil {
 		if errors.Is(err, pkg.ErrRecordNotFound) {
-			wrongCred := helper.ResponseData(http.StatusConflict, "email or password invalid!", nil)
-			return c.JSON(http.StatusConflict, wrongCred)
+			return helper.ErrorHandler(c, http.StatusBadRequest, "email or password invalid!")
 		}
 
-		internalErr := helper.ResponseData(http.StatusInternalServerError, err.Error(), nil)
-		return c.JSON(http.StatusInternalServerError, internalErr)
+		return helper.ErrorHandler(c, http.StatusInternalServerError, "internal server error!")
 	}
 
 	responseUser := dto.LoginResponse{
@@ -85,6 +77,6 @@ func (h *authHandler) LoginHandler(c echo.Context) error {
 		Token: token,
 	}
 
-	response := helper.ResponseData(http.StatusOK, "Login Successfully!", responseUser)
+	response := helper.ResponseData(http.StatusOK, "login successfully!", responseUser)
 	return c.JSON(http.StatusOK, response)
 }
