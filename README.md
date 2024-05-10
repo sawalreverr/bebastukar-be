@@ -30,6 +30,10 @@ Selain itu, pengguna dapat menambahkan postingan untuk barang bekas yang ingin m
 - Pengguna dapat memberikan, mengubah, dan menghapus komentar terhadap postingan pengguna lain.
 - Pengguna dapat membalas, mengubah, menghapus komentar dari pengguna lain (reply comment).
 
+#### Chat Bot:
+
+- Pengguna dapat menanyakan terkait pengelolaan atau contoh barang bekas yang layak untuk ditukar kepada AI.
+
 ### Penggunaan Publik:
 
 - Pengguna dapat melihat profil pengguna lain dengan menggunakan ID.
