@@ -13,3 +13,6 @@ cloudinary:
   cloudname: <your_cloudname>
   apikey: <your_apikey>
   apisecret: <your_apisecret>
+
+generativeai:
+  apikey: <your_apikey>

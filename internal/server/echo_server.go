@@ -62,6 +62,9 @@ func (s *echoServer) Start() {
 	// Discussion
 	s.discussionHttpHandler()
 
+	// Chatbot
+	s.chatbotHttpHandler()
+
 	serverPORT := fmt.Sprintf(":%d", s.conf.Server.Port)
 	s.app.Logger.Fatal(s.app.Start(serverPORT))
 }

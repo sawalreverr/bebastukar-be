@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/sawalreverr/bebastukar-be/internal/chatbot"
 	"github.com/sawalreverr/bebastukar-be/internal/handler"
 	"github.com/sawalreverr/bebastukar-be/internal/middleware"
 	"github.com/sawalreverr/bebastukar-be/internal/repository"
@@ -80,4 +81,12 @@ func (s *echoServer) discussionHttpHandler() {
 	discussion.POST("/discussion/:id/:commentID/reply", discussionHandler.AddDiscussionReplyCommentHandler)
 	discussion.PUT("/discussion/:id/:commentID/:replyCommentID", discussionHandler.EditDiscussionReplyCommentHandler)
 	discussion.DELETE("/discussion/:id/:commentID/:replyCommentID", discussionHandler.DeleteDiscussionReplyCommentHandler)
+}
+
+func (s *echoServer) chatbotHttpHandler() {
+	// This is only for our first version of my project will be updated later
+	chatBotHandler := chatbot.NewDiscussionHandler()
+
+	chatBotGroup := s.gr.Group("", middleware.JWTMiddleware)
+	chatBotGroup.GET("/chatbot", chatBotHandler.QuestionHandler)
 }

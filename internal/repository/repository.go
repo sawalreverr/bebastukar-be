@@ -40,4 +40,9 @@ type DiscussionRepository interface {
 	DeleteReplyComment(discussionReplyCommentID string, discussionCommentID string, discussionID string, userID string) error
 	FindAllReplyComment(discussionCommentID string) (*[]entity.DiscussionReplyComments, error)
 	FindReplyCommentByID(discussionReplyCommentID string) (*entity.DiscussionReplyComments, error)
+
+	// ChatBot with Google AI
+	// TODO
+	// Create history chat from userID to database
+	// Find all history chat from userID
 }
