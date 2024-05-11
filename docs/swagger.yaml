@@ -1,0 +1,1409 @@
+openapi: '3.0.2'
+info:
+  title: Bebastukar - Mini Project - OpenAPI 3.0
+  description: "API Documentation Mini Project Bebastukar"
+  version: '1.0'
+servers:
+  - url: http://localhost:8080/api/v1
+tags:
+  - name: authentication
+    description: "Endpoint for authentication"
+  - name: user
+    description: "Endpoint for user profile"
+  - name: discussion
+    description: "Endpoint for topic discussion like tweet/thread"
+  - name: discussion comment
+    description: "Endpoint for comment on topic discussion"
+  - name: discussion reply comment
+    description: "Endpoint for reply comment on other user comment of discussion"
+  - name: chatbot
+    description: "Endpoint for chatbot using generative ai from google"
+  - name: public
+    description: "Endpoint for public uses, doesnt need auth"
+
+paths:
+  /register:
+    post:
+      tags:
+        - "authentication"
+      summary: "user register"
+      description: "user melakukan register dengan data berupa name, phone_number, email, dan password"
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - phone_number
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                phone_number:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              example:
+                name: John Doe
+                phone_number: 089511223344
+                email: john.doe@gmail.com
+                password: password@123
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      phone_number:
+                        type: string
+                      email:
+                        type: string
+              example:
+                code: 200
+                message: register successfully!
+                data:
+                  id: 4b2aa105-9c10-41eb-bdb8-deb3ffba89a3
+                  name: John Doe
+                  phone_number: 089511223344
+                  email: john.doe@gmail.com
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: data validation error!
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 409
+                message: email already registered!
+
+  /login:
+    post:
+      tags:
+        - "authentication"
+      summary: "user login"
+      description: "user melakukan login dengan data berupa email dan password untuk mendapatkan token"
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              example:
+                email: john.doe@gmail.com
+                password: password@123
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    properties:
+                      email:
+                        type: string
+                      token:
+                        type: string
+              example:
+                code: 200
+                message: login successfully!!
+                data:
+                  email: john.doe@gmail.com
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNmViNWNmZTItYjNkNS00ZmJiLTlmMDAtZjJmODk2M2FiZDM1Iiwicm9sZSI6InVzZXIiLCJleHAiOjE3MTU2MjgwNzB9.ZWzYJk5CrVxv304DikUKajNhBec1z47W5AYFNn0z9kY
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: email or password invalid!
+
+  /users:
+    get:
+      tags:
+        - user
+      summary: profile user
+      description: user mendapatkan informasi akun
+      operationId: getDataUser
+      security:
+        - Bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      phone_number:
+                        type: string
+                      role:
+                        type: string
+                      image_url:
+                        type: string
+                      bio:
+                        type: string
+              example:
+                code: 200
+                message: ok
+                data:
+                  id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                  name: John Doe
+                  email: john.doe@gmail.com
+                  phone_number: 089511223344
+                  role: user
+                  image_url: https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715369625/bebastukar/avatar/hoaqpzsaiovgqrih7rbx.jpg
+                  bio: ""
+        "400":
+          description: Bad request - Token not provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: invalid token format. use bearer token!
+
+    put:
+      tags:
+        - user
+      summary: profile update
+      description: user dapat melakukan update pada name, phone_number, dan bio
+      operationId: updateDataUser
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - phone_number
+                - bio
+              properties:
+                name:
+                  type: string
+                phone_number:
+                  type: string
+                bio:
+                  type: string
+              example:
+                name: John Dio
+                phone_number: 089512322123
+                bio: this is my bio
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: update successfully!
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: name or phone number invalid!
+    
+  /users/uploadAvatar:  
+    post:
+      tags:
+        - user
+      summary: profile upload avatar
+      description: user dapat melakukan upload image sebagai avatar profile mereka
+      operationId: uploadAvatarUser
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: image
+              example:
+                image: your_image.jpg
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: image uploaded!
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: upload image size must less than 2MB!
+
+  /discussion:
+    get:
+      tags:
+        - discussion
+      summary: get all discussion from user by auth id
+      description: user mendapatkan semua topik diskusi yang pernah dia buat 
+      operationId: getDiscussionUser
+      security:
+        - Bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    properties:
+                      id:
+                        type: string
+                      author_id:
+                        type: string
+                      content:
+                        type: string
+                      images:
+                        type: array
+                      comments:
+                        type: array
+                        properties:
+                          id:
+                            type: string
+                          author_id:
+                            type: string
+                          discussion_id:
+                            type: string
+                          comment:
+                            type: string
+                          created_at:
+                            type: string
+                          updated_at:
+                            type: string
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                code: 200
+                message: ok
+                data:
+                  - id: 0524a7e9-eb74-405a-939e-009a8b3dd718
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    content: test diskusi
+                    images: 
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715169204/bebastukar/discussion/xvy8vxhbvvykhx0nn4dp.jpg
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715169203/bebastukar/discussion/fdlz6egahuthljbi6y9x.jpg
+                    comments: []
+                    created_at: 2024-05-08T18:53:24.809+07:00
+                    updated_at: 2024-05-08T18:53:24.809+07:00
+
+                  - id: 23ee8cc7-1dc1-497e-82b9-a3b20cd3a018
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    content: test diskusi 2
+                    images: 
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715096832/bebastukar/discussion/varahvzcq9mfizq76ik3.jpg
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715096831/bebastukar/discussion/pjkahhdbomeocntsw6dt.jpg
+                    comments: 
+                      - id: 53bc550b-f761-4f8e-9fd0-dcdc1765303f
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        comment: test comment
+                        created_at: 2024-05-09T20:50:09.765+07:00
+                        updated_at: 2024-05-09T20:50:09.765+07:00
+                      - id: 8b17e5ae-3f65-4c02-9b2a-9cb33be795fc
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        comment: test comment 2
+                        created_at: 2024-05-09T20:50:09.765+07:00
+                        updated_at: 2024-05-09T20:50:09.765+07:00
+                    created_at: 2024-05-08T18:53:24.809+07:00
+                    updated_at: 2024-05-08T18:53:24.809+07:00
+    post:
+      tags:
+        - discussion
+      summary: add new discussion
+      description: user dapat membuat topik diskusi baru 
+      operationId: addDiscussion
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - content
+                - images
+              properties:
+                content:
+                  type: string
+                images:
+                  type: string
+                  format: image
+              example:
+                content: test new discussion
+                image: your_image.jpg
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    properties:
+                      id:
+                        type: string
+                      author_id:
+                        type: string
+                      content:
+                        type: string
+                      images:
+                        type: array
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                code: 201
+                message: discussion created!
+                data:
+                  - id: db387917-f014-4b53-b754-ab65f5f87fa7
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    content: test new discussion
+                    images: 
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715183773/bebastukar/discussion/gdvmx9ycww7rx59nauga.jpg
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715183774/bebastukar/discussion/zsc8aakeghg5tqz8ryxx.jpg
+                    created_at: 2024-05-08T22:56:14.521+07:00
+                    updated_at: 0001-01-01T00:00:00Z  
+        "400":
+          description: Bad Request - content form empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: content must not be empty and must have at least 1 letter
+
+  /discussion/{discussion_id}:
+    put:
+      tags:
+        - discussion
+      summary: edit discussion
+      description: user dapat mengubah konten topik diskusi 
+      operationId: editDiscussion
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - content
+                - images
+              properties:
+                content:
+                  type: string
+                images:
+                  type: string
+                  format: image
+              example:
+                content: test edit discussion
+                image: your_image.jpg
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: discussion updated!
+        "404":
+          description: Discussion not found - discsussion_id invalid 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: discussiond not found!
+    delete:
+      tags:
+        - discussion
+      summary: delete discussion
+      description: user dapat menghapus topik diskusi 
+      operationId: deleteDiscussion
+      security:
+        - Bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: discussion deleted!
+        "404":
+          description: Discussion not found - discsussion_id invalid 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: discussiond not found!
+    
+    get:
+      tags:
+        - public
+      summary: get discussion by id
+      description: user dapat melihat data topik diskusi secara lengkap
+      operationId: getDiscussionByID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      author_id:
+                        type: string
+                      content:
+                        type: string
+                      images:
+                        type: array
+                      comments:
+                        type: array
+                        properties:
+                          id:
+                            type: string
+                          author_id:
+                            type: string
+                          discussion_id:
+                            type: string
+                          comment:
+                            type: string
+                          reply_comments:
+                            type: array
+                            properties:
+                              id:
+                                type: string  
+                              author_id:
+                                type: string  
+                              discussion_id:
+                                type: string  
+                              discussion_comment_id:
+                                type: string  
+                              comment:
+                                type: string  
+                              created_at:
+                                type: string  
+                              updated_at:
+                                type: string  
+                          created_at:
+                            type: string
+                          updated_at:
+                            type: string
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                code: 200
+                message: ok
+                data: 
+                  id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                  author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                  content: test discussion
+                  images:
+                    - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715164862/bebastukar/discussion/h5if2zuasoqe8i6eokhp.jpg
+                    - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715164861/bebastukar/discussion/nauzlo89znxxctm88vp7.jpg
+                  comments:
+                    - id: 53bc550b-f761-4f8e-9fd0-dcdc1765303f
+                      author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                      discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                      comment: test comment
+                      created_at: 2024-05-09T20:48:55.247+07:00
+                      updated_at: 2024-05-09T20:48:55.247+07:00
+                    - id: 8b17e5ae-3f65-4c02-9b2a-9cb33be795fc
+                      author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                      discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                      comment: test comment 2
+                      created_at: 2024-05-09T20:48:55.247+07:00
+                      updated_at: 2024-05-09T20:48:55.247+07:00
+                    - id: 8e798c6b-65f3-4c75-a7d6-eed011aed3e9
+                      author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                      discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                      comment: test comment 3
+                      created_at: 2024-05-09T20:48:55.247+07:00
+                      updated_at: 2024-05-09T20:48:55.247+07:00
+                    - id: c8b8ce3a-e005-4df6-9406-49360842d505
+                      author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                      discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                      comment: test comment 4
+                      reply_comments:
+                        - id: 24547b70-9fb8-43a2-8031-0934942c9068
+                          author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                          discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                          discussion_comment_id: c8b8ce3a-e005-4df6-9406-49360842d505
+                          comment: test reply comment
+                          created_at: 2024-05-09T03:02:36.986+07:00
+                          updated_at: 2024-05-09T03:02:36.986+07:00
+                        - id: 8bd62596-a504-4c98-8f4b-8a5b830ba0b0
+                          author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                          discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                          discussion_comment_id: c8b8ce3a-e005-4df6-9406-49360842d505
+                          comment: test reply comment 2
+                          created_at: 2024-05-09T02:48:19.122+07:00
+                          updated_at: 2024-05-09T02:48:19.122+07:00
+                      created_at: 2024-05-09T20:48:55.247+07:00
+                      updated_at: 2024-05-09T20:48:55.247+07:00
+        "404":
+          description: Not found - discussion not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 404
+                message: discussion not found!
+
+
+  /discussion/{discussion_id}/comment:
+    post:
+      tags:
+        - discussion comment
+      summary: add new comment on discussion
+      description: user dapat memberi komentar pada sebuah topik diskusi 
+      operationId: addDiscussionComment
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - comment
+              properties:
+                comment:
+                  type: string
+              example:
+                comment: test comment
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      author_id:
+                        type: string
+                      discussion_id:
+                        type: string
+                      comment:
+                        type: string
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                code: 201
+                message: comment added!
+                data:
+                  id: 8e798c6b-65f3-4c75-a7d6-eed011aed3e9
+                  author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                  discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                  comment: test comment
+                  created_at: 2024-05-09T20:59:35.689+07:00
+                  updated_at: 0001-01-01T00:00:00Z  
+        "400":
+          description: Bad Request - comment form empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: comment must not be empty and must have at least 1 letter!
+
+  /discussion/{discussion_id}/{comment_id}:
+    put:
+      tags:
+        - discussion comment
+      summary: edit comment on discussion
+      description: user dapat mengubah komentar pada sebuah topik diskusi 
+      operationId: editDiscussionComment
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - comment
+              properties:
+                comment:
+                  type: string
+              example:
+                comment: test update comment
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: comment updated!
+        "400":
+          description: Bad Request - comment form empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: comment must not be empty and must have at least 1 letter!
+
+    delete:
+      tags:
+        - discussion comment
+      summary: delete comment on discussion
+      description: user dapat menghapus komentar pada sebuah topik diskusi 
+      operationId: deleteDiscussionComment
+      security:
+        - Bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: comment deleted!
+        "404":
+          description: Not found - comment not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 404
+                message: comment not found!
+
+    get:
+      tags:
+        - public
+      summary: get comment on discussion by id
+      description: user dapat melihat data seluruh komen yang ada pada sebuah topik diskusi
+      operationId: getDiscussionComment
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    properties:
+                      id:
+                        type: string
+                      author_id:
+                        type: string
+                      discussion_id:
+                        type: string
+                      comment:
+                        type: string
+                      reply_comments:
+                        type: array
+                        properties:
+                          id:
+                            type: string  
+                          author_id:
+                            type: string  
+                          discussion_id:
+                            type: string  
+                          discussion_comment_id:
+                            type: string  
+                          comment:
+                            type: string  
+                          created_at:
+                            type: string  
+                          updated_at:
+                            type: string  
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                code: 200
+                message: ok
+                data:
+                  - id: 53bc550b-f761-4f8e-9fd0-dcdc1765303f
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                    comment: test comment
+                    created_at: 2024-05-09T20:48:55.247+07:00
+                    updated_at: 2024-05-09T20:48:55.247+07:00
+                  - id: 8b17e5ae-3f65-4c02-9b2a-9cb33be795fc
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                    comment: test comment 2
+                    created_at: 2024-05-09T20:48:55.247+07:00
+                    updated_at: 2024-05-09T20:48:55.247+07:00
+                  - id: 8e798c6b-65f3-4c75-a7d6-eed011aed3e9
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                    comment: test comment 3
+                    created_at: 2024-05-09T20:48:55.247+07:00
+                    updated_at: 2024-05-09T20:48:55.247+07:00
+                  - id: c8b8ce3a-e005-4df6-9406-49360842d505
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                    comment: test comment 4
+                    reply_comments:
+                      - id: 24547b70-9fb8-43a2-8031-0934942c9068
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        discussion_comment_id: c8b8ce3a-e005-4df6-9406-49360842d505
+                        comment: test reply comment
+                        created_at: 2024-05-09T03:02:36.986+07:00
+                        updated_at: 2024-05-09T03:02:36.986+07:00
+                      - id: 8bd62596-a504-4c98-8f4b-8a5b830ba0b0
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        discussion_comment_id: c8b8ce3a-e005-4df6-9406-49360842d505
+                        comment: test reply comment 2
+                        created_at: 2024-05-09T02:48:19.122+07:00
+                        updated_at: 2024-05-09T02:48:19.122+07:00
+                      - id: 950c7a4a-c817-4d42-b686-2c94a8673f74
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        discussion_comment_id: c8b8ce3a-e005-4df6-9406-49360842d505
+                        comment: test reply comment 3
+                        created_at: 2024-05-09T02:48:19.122+07:00
+                        updated_at: 2024-05-09T02:48:19.122+07:00
+                      - id: b9052a3c-5c0b-475e-9c91-96274c712618
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        discussion_comment_id: c8b8ce3a-e005-4df6-9406-49360842d505
+                        comment: test reply comment 4
+                        created_at: 2024-05-09T02:48:19.122+07:00
+                        updated_at: 2024-05-09T02:48:19.122+07:00
+                    created_at: 2024-05-09T20:48:55.247+07:00
+                    updated_at: 2024-05-09T20:48:55.247+07:00
+        "404":
+          description: Not found - comment not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 404
+                message: comment not found!
+
+  /discussion/{discussion_id}/{comment_id}/reply:
+    post:
+      tags:
+        - discussion reply comment
+      summary: add new reply comment on other comment
+      description: user dapat membalas komentar pengguna lain pada sebuah topik diskusi 
+      operationId: addDiscussionReplyComment
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - comment
+              properties:
+                comment:
+                  type: string
+              example:
+                comment: test comment
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      author_id:
+                        type: string
+                      discussion_id:
+                        type: string
+                      discussion_comment_id:
+                        type: string
+                      comment:
+                        type: string
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                code: 201
+                message: reply comment created!
+                data:
+                  id: d0e78fff-ed0d-4ccf-a442-89b1c2e797d6
+                  author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                  discsussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                  discussion_comment_id: c8b8ce3a-e005-4df6-9406-49360842d505
+                  comment: test reply comment
+                  created_at: 2024-05-09T20:59:35.689+07:00
+                  updated_at: 0001-01-01T00:00:00Z  
+        "400":
+          description: Bad Request - comment form empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: comment must not be empty and must have at least 1 letter!
+
+  /discussion/{discussion_id}/{comment_id}/{reply_comment_id}:
+    put:
+      tags:
+        - discussion reply comment
+      summary: edit reply comment on discussion
+      description: user dapat mengubah balasan komentar pada sebuah topik diskusi 
+      operationId: editDiscussionReplyComment
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - comment
+              properties:
+                comment:
+                  type: string
+              example:
+                comment: test update reply comment
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: reply comment updated!
+        "400":
+          description: Bad Request - comment form empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: comment must not be empty and must have at least 1 letter!
+
+    delete:
+      tags:
+        - discussion reply comment
+      summary: delete reply comment on discussion
+      description: user dapat menghapus balasan komentar pada sebuah topik diskusi 
+      operationId: deleteDiscussionReplyComment
+      security:
+        - Bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 200
+                message: reply comment deleted!
+        "404":
+          description: Not found - reply comment not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 404
+                message: reply comment not found!
+
+  /chatbot:
+    post:
+      tags:
+        - chatbot
+      summary: ask question about second hand using AI
+      description: user dapat menanyakan kepada ai terkait barang bekas 
+      operationId: askChatBot
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - question
+              properties:
+                question:
+                  type: string
+              example:
+                question: berikan saya beberapa contoh barang bekas yang dapat ditukarkan
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                      answer_ai:
+                        type: string
+              example:
+                code: 200
+                message: ok
+                data:
+                  question: berikan saya beberapa contoh barang bekas yang dapat ditukarkan
+                  answer_ai: Beberapa contoh barang bekas yang bisa kamu tukarkan:\n\n*  **Botol plastik dan kaleng bekas:**  Ini bisa ditukarkan di bank sampah atau pengepul rongsok.\n*  **Kertas dan kardus bekas:**  Sama seperti botol dan kaleng, ini juga bisa ditukar di bank sampah atau pengepul.\n*  **Pakaian bekas:**  Kamu bisa menukarkannya di toko baju bekas atau mendonasikannya ke berbagai yayasan.\n*  **Barang elektronik bekas:**  Beberapa toko elektronik menerima tukar tambah dengan barang elektronik lama, atau kamu bisa menjualnya secara online.\n*  **Peralatan rumah tangga bekas:**  Jika masih berfungsi dengan baik, kamu bisa menjualnya di platform jual beli online atau menukarkannya di toko barang bekas.\n\nIngat ya, pastikan barang bekas yang kamu tukarkan masih dalam kondisi layak dan bersih. \n
+        "400":
+          description: Bad Request - question form empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 400
+                message: question must not be empty and at least 5 letter
+        
+  /users/{user_id}:
+    get:
+      tags:
+        - public
+      summary: get other user information by userid
+      description: user dapat mendapatkan beberapa informasi seperti nama, avatar, dan bio 
+      operationId: getUserInfo
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      phone_number:
+                        type: string
+                      role:
+                        type: string
+                      image_url:
+                        type: string
+                      bio:
+                        type: string
+              example:
+                code: 200
+                message: ok
+                data: 
+                  id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                  name: John Dio
+                  email: john.doe@gmail.com
+                  phone_number: 08972323222
+                  role: user
+                  image_url: https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715369625/bebastukar/avatar/hoaqpzsaiovgqrih7rbx.jpg
+                  bio: This is John Diooo Bio
+        "404":
+          description: Not found - user not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 404
+                message: user not found!
+  
+  /discussion/user/{user_id}:              
+    get:
+      tags:
+        - public
+      summary: get all other user discussion by userid
+      description: user dapat mendapatkan semua diskusi yang pernah dibuat oleh pengguna lain
+      operationId: getAllOtherUserDiscussion
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    properties:
+                      id:
+                        type: string
+                      author_id:
+                        type: string
+                      content:
+                        type: string
+                      images:
+                        type: array
+                      comments:
+                        type: array
+                        properties:
+                          id:
+                            type: string
+                          author_id:
+                            type: string
+                          discussion_id:
+                            type: string
+                          comment:
+                            type: string
+                          created_at:
+                            type: string
+                          updated_at:
+                            type: string
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                code: 200
+                message: ok
+                data: 
+                  - id: 0524a7e9-eb74-405a-939e-009a8b3dd718
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    content: test diskusi
+                    images: 
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715169204/bebastukar/discussion/xvy8vxhbvvykhx0nn4dp.jpg
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715169203/bebastukar/discussion/fdlz6egahuthljbi6y9x.jpg
+                    comments: []
+                    created_at: 2024-05-08T18:53:24.809+07:00
+                    updated_at: 2024-05-08T18:53:24.809+07:00
+                  - id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                    author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                    content: test diskusi 2
+                    images: 
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715169204/bebastukar/discussion/xvy8vxhbvvykhx0nn4dp.jpg
+                      - https://res.cloudinary.com/dlbbsdd3a/image/upload/v1715169203/bebastukar/discussion/fdlz6egahuthljbi6y9x.jpg
+                    comments:
+                      - id: 53bc550b-f761-4f8e-9fd0-dcdc1765303f
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        comment: test comment
+                        created_at: 2024-05-09T20:50:09.765+07:00
+                        updated_at: 2024-05-09T20:50:09.765+07:00
+
+                      - id: 8b17e5ae-3f65-4c02-9b2a-9cb33be795fc
+                        author_id: 6eb5cfe2-b3d5-4fbb-9f00-f2f8963abd35
+                        discussion_id: b7078489-6f9e-4d95-90eb-8c17f5378149
+                        comment: test comment 2
+                        created_at: 2024-05-09T20:50:09.765+07:00
+                        updated_at: 2024-05-09T20:50:09.765+07:00          
+        "404":
+          description: Not found - user not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: integer
+                  message:
+                    type: string
+              example:
+                code: 404
+                message: user not found!

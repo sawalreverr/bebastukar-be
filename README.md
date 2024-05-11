@@ -70,6 +70,7 @@ Selain itu, pengguna dapat menambahkan postingan untuk barang bekas yang ingin m
 - [Viper](https://github.com/spf13/viper) (Configuration)
 - [Validator](https://github.com/go-playground/validator) (Type validation)
 - [JWT](https://github.com/golang-jwt/jwt) (Middleware)
+- [Generative AI](https://github.com/google/generative-ai-go) (Chat Bot)
 - MySQL (SQL)
 - [GORM](https://gorm.io/docs/) (ORM)
 
