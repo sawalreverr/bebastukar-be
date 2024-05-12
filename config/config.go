@@ -6,9 +6,10 @@ import (
 
 type (
 	Config struct {
-		Server     *Server
-		DB         *DB
-		Cloudinary *Cloudinary
+		Server       *Server
+		DB           *DB
+		Cloudinary   *Cloudinary
+		GenerativeAI *GenerativeAI
 	}
 
 	Server struct {
@@ -18,7 +19,7 @@ type (
 
 	DB struct {
 		Host     string
-		Port     int
+		Port     string
 		User     string
 		Password string
 		DBName   string
@@ -28,6 +29,10 @@ type (
 		CloudName string
 		ApiKey    string
 		ApiSecret string
+	}
+
+	GenerativeAI struct {
+		ApiKey string
 	}
 )
 

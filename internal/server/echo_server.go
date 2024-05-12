@@ -50,6 +50,13 @@ func (s *echoServer) Start() {
 		return c.String(http.StatusOK, "OK")
 	})
 
+	// swagger
+	s.app.Static("/assets", "web/assets")
+	s.app.Static("/docs", "docs")
+	s.app.GET("/", func(c echo.Context) error {
+		return c.File("web/index.html")
+	})
+
 	// Public
 	s.publicHttpHandler()
 
@@ -61,6 +68,9 @@ func (s *echoServer) Start() {
 
 	// Discussion
 	s.discussionHttpHandler()
+
+	// Chatbot
+	s.chatbotHttpHandler()
 
 	serverPORT := fmt.Sprintf(":%d", s.conf.Server.Port)
 	s.app.Logger.Fatal(s.app.Start(serverPORT))

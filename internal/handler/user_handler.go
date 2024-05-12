@@ -25,8 +25,7 @@ func (h *userHandler) ProfileGet(c echo.Context) error {
 
 	userFound, err := h.userUsecase.FindUserByID(userID)
 	if err != nil {
-		internalErr := helper.ResponseData(http.StatusInternalServerError, err.Error(), nil)
-		return c.JSON(http.StatusInternalServerError, internalErr)
+		return helper.ErrorHandler(c, http.StatusInternalServerError, "internal server error!")
 	}
 
 	userResponse := dto.ProfileUser{
@@ -39,7 +38,7 @@ func (h *userHandler) ProfileGet(c echo.Context) error {
 		Bio:         userFound.Bio,
 	}
 
-	response := helper.ResponseData(http.StatusOK, "Your profile information!", userResponse)
+	response := helper.ResponseData(http.StatusOK, "ok", userResponse)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -50,21 +49,18 @@ func (h *userHandler) ProfileUpdate(c echo.Context) error {
 	userID := claims.UserID
 
 	if err := c.Bind(&userRequest); err != nil {
-		bindErr := helper.ResponseData(http.StatusBadRequest, err.Error(), nil)
-		return c.JSON(http.StatusBadRequest, bindErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "bind error!")
 	}
 
 	if err := c.Validate(&userRequest); err != nil {
-		validateErr := helper.ResponseData(http.StatusBadRequest, err.Error(), nil)
-		return c.JSON(http.StatusBadRequest, validateErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "name or phone number invalid!")
 	}
 
 	if err := h.userUsecase.UpdateUser(userID, userRequest); err != nil {
-		internalErr := helper.ResponseData(http.StatusInternalServerError, err.Error(), nil)
-		return c.JSON(http.StatusInternalServerError, internalErr)
+		return helper.ErrorHandler(c, http.StatusInternalServerError, "internal server error!")
 	}
 
-	response := helper.ResponseData(http.StatusOK, "Update Successfully!", nil)
+	response := helper.ResponseData(http.StatusOK, "update successfully!", nil)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -73,15 +69,13 @@ func (h *userHandler) FindUser(c echo.Context) error {
 	id, err := uuid.Parse(userID)
 
 	if err != nil {
-		parseErr := helper.ResponseData(http.StatusBadRequest, "ID invalid", nil)
-		return c.JSON(http.StatusBadRequest, parseErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "param id invalid!")
 	}
 
 	userFound, err := h.userUsecase.FindUserByID(id.String())
 
 	if err != nil {
-		internalErr := helper.ResponseData(http.StatusInternalServerError, err.Error(), nil)
-		return c.JSON(http.StatusInternalServerError, internalErr)
+		return helper.ErrorHandler(c, http.StatusNotFound, "user not found!")
 	}
 
 	userResponse := dto.ProfileUser{
@@ -94,7 +88,7 @@ func (h *userHandler) FindUser(c echo.Context) error {
 		Bio:         userFound.Bio,
 	}
 
-	response := helper.ResponseData(http.StatusFound, "User Found!", userResponse)
+	response := helper.ResponseData(http.StatusFound, "ok", userResponse)
 	return c.JSON(http.StatusFound, response)
 }
 
@@ -105,19 +99,16 @@ func (h *userHandler) UploadAvatar(c echo.Context) error {
 	userID := claims.UserID
 
 	if err != nil {
-		missingErr := helper.ResponseData(http.StatusBadRequest, "please upload your image!", nil)
-		return c.JSON(http.StatusBadRequest, missingErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "please upload your image!")
 	}
 
 	if file.Size > 2*1024*1024 {
-		tooLarge := helper.ResponseData(http.StatusBadRequest, "upload image size must less than 2MB!", nil)
-		return c.JSON(http.StatusBadRequest, tooLarge)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "upload image size must less than 2MB!")
 	}
 
 	fileType := file.Header.Get("Content-Type")
 	if !strings.HasPrefix(fileType, "image/") {
-		typeErr := helper.ResponseData(http.StatusBadRequest, "only image allowed!", nil)
-		return c.JSON(http.StatusBadRequest, typeErr)
+		return helper.ErrorHandler(c, http.StatusBadRequest, "only image allowed!")
 	}
 
 	src, _ := file.Open()
@@ -125,16 +116,14 @@ func (h *userHandler) UploadAvatar(c echo.Context) error {
 
 	resp, err := helper.UploadToCloudinary(src, "bebastukar/avatar/")
 	if err != nil {
-		cloudUploadErr := helper.ResponseData(http.StatusInternalServerError, "upload error!", nil)
-		return c.JSON(http.StatusInternalServerError, cloudUploadErr)
+		return helper.ErrorHandler(c, http.StatusInternalServerError, "upload failed, cloudinary server error!")
 	}
 
 	err = h.userUsecase.UpdateUserAvatar(userID, resp)
 	if err != nil {
-		updateErr := helper.ResponseData(http.StatusInternalServerError, "update database error!", nil)
-		return c.JSON(http.StatusInternalServerError, updateErr)
+		return helper.ErrorHandler(c, http.StatusInternalServerError, "update database error!")
 	}
 
-	response := helper.ResponseData(http.StatusOK, "Image Uploaded!", nil)
+	response := helper.ResponseData(http.StatusOK, "image uploaded!", nil)
 	return c.JSON(http.StatusOK, response)
 }

@@ -42,4 +42,9 @@ type DiscussionUsecase interface {
 
 	// Discussion Reply Comment Find
 	GetAllReplyCommentFromComment(discussionCommentID string) (*[]dto.DiscussionReplyCommentResponse, error)
+
+	// ChatBot with Google AI
+	// TODO
+	// Create history chat from userID to database
+	// Find all history chat from userID
 }

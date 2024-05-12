@@ -16,11 +16,11 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		authHeader := c.Request().Header.Get("Authorization")
 		if authHeader == "" {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Token is not provided")
+			return helper.ErrorHandler(c, http.StatusUnauthorized, "Token is not provided")
 		}
 
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			return echo.NewHTTPError(http.StatusBadRequest, "Invalid token format. Use Bearer token")
+			return helper.ErrorHandler(c, http.StatusBadRequest, "Invalid token format. Use Bearer token")
 		}
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
@@ -29,19 +29,17 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		})
 
 		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token signature")
-			}
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return helper.ErrorHandler(c, http.StatusUnauthorized, "Invalid token signature")
 		}
 
 		if claims, ok := token.Claims.(*helper.JwtCustomClaims); ok && next != nil {
 			if claims.Role != "user" && claims.Role != "admin" {
-				return echo.ErrUnauthorized
+				return helper.ErrorHandler(c, http.StatusUnauthorized, "Unauthorized")
 			}
 			c.Set("user", claims)
 			return next(c)
 		}
-		return echo.ErrUnauthorized
+
+		return helper.ErrorHandler(c, http.StatusUnauthorized, "Unauthorized")
 	}
 }
