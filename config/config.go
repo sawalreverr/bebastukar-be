@@ -19,7 +19,7 @@ type (
 
 	DB struct {
 		Host     string
-		Port     int
+		Port     string
 		User     string
 		Password string
 		DBName   string

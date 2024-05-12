@@ -22,7 +22,7 @@ func NewMySQLDatabase(conf *config.Config) Database {
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		fmt.Printf("Error connecting to database: %v\n", err)
+		log.Fatalf("Error connecting to database: %v\n", err)
 	}
 
 	log.Println("Successfully connected to database:", conf.DB.DBName)

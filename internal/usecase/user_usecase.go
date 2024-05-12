@@ -53,8 +53,7 @@ func (u *userUsecase) LoginUser(email string, password string) (string, error) {
 		return "", pkg.ErrRecordNotFound
 	}
 
-	secretKey := "SECRET@123" // change it because error when testing
-	token, err := helper.GenerateTokenJWT(userFound.ID, userFound.Role, secretKey)
+	token, err := helper.GenerateTokenJWT(userFound.ID, userFound.Role)
 
 	return token, err
 }
