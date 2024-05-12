@@ -76,7 +76,7 @@ Selain itu, pengguna dapat menambahkan postingan untuk barang bekas yang ingin m
 
 ## API Documentation
 
-sertakan dokumentasi API yang dibuat dengan menggunakan postman / swagger.
+[Postman](https://www.postman.com/sawalrever23/documentation/34865902-c6fdc891-f879-4034-b8f1-4e5850f8f522)
 
 ## ERD
 

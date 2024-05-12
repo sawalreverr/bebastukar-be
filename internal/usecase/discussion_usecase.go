@@ -447,12 +447,13 @@ func (u *discussionUsecase) GetAllReplyCommentFromComment(discussionCommentID st
 
 	for _, comment := range *comments {
 		commentResp := dto.DiscussionReplyCommentResponse{
-			ID:           comment.ID,
-			AuthorID:     comment.UserID,
-			DiscussionID: comment.DiscussionID,
-			ReplyComment: comment.Comment,
-			CreatedAt:    comment.CreatedAt,
-			UpdatedAt:    comment.UpdatedAt,
+			ID:                  comment.ID,
+			AuthorID:            comment.UserID,
+			DiscussionID:        comment.DiscussionID,
+			DiscussionCommentID: comment.DiscussionCommentID,
+			ReplyComment:        comment.Comment,
+			CreatedAt:           comment.CreatedAt,
+			UpdatedAt:           comment.UpdatedAt,
 		}
 
 		response = append(response, commentResp)

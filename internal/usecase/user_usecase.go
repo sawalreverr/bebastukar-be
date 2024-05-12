@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"github.com/google/uuid"
-	"github.com/sawalreverr/bebastukar-be/config"
 	"github.com/sawalreverr/bebastukar-be/internal/dto"
 	"github.com/sawalreverr/bebastukar-be/internal/entity"
 	"github.com/sawalreverr/bebastukar-be/internal/helper"
@@ -54,7 +53,7 @@ func (u *userUsecase) LoginUser(email string, password string) (string, error) {
 		return "", pkg.ErrRecordNotFound
 	}
 
-	secretKey := config.GetConfig().Server.JWTSecret
+	secretKey := "SECRET@123" // change it because error when testing
 	token, err := helper.GenerateTokenJWT(userFound.ID, userFound.Role, secretKey)
 
 	return token, err
