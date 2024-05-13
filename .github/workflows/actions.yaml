@@ -93,3 +93,4 @@ jobs:
 
             docker cp config.yaml bebastukar:/config.yaml
             docker container restart bebastukar
+            rm config.yaml || true

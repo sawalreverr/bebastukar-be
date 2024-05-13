@@ -88,5 +88,5 @@ func (s *echoServer) chatbotHttpHandler() {
 	chatBotHandler := chatbot.NewDiscussionHandler()
 
 	chatBotGroup := s.gr.Group("", middleware.JWTMiddleware)
-	chatBotGroup.GET("/chatbot", chatBotHandler.QuestionHandler)
+	chatBotGroup.POST("/chatbot", chatBotHandler.QuestionHandler)
 }
