@@ -61,11 +61,11 @@ jobs:
             docker images | grep -q mysql || docker pull mysql:latest
             docker pull sawalrever23/bebastukar:latest
 
-            sleep 15
-            docker exec -i mysql-service mysql -uroot -p${{ secrets.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS bebastukar_db;"
-
             docker run -itd --name mysql-service --network api-network -p 3306:3306 -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} mysql:latest
             docker run -itd --name bebastukar -p 8080:8080 --network api-network sawalrever23/bebastukar:latest
+
+            sleep 15
+            docker exec -i mysql-service mysql -uroot -p${{ secrets.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS bebastukar_db;"
 
             touch config.yaml
             echo "server:" >> config.yaml
@@ -83,5 +83,6 @@ jobs:
             echo "  apisecret: ${{ secrets.CLOUDINARY_APISECRET }}" >> config.yaml
             echo "generativeai:" >> config.yaml
             echo "  apikey: ${{ secrets.GENERATIVEAI_APIKEY }}" >> config.yaml
+            
             docker cp config.yaml bebastukar:/config.yaml
-            docker restart bebastukar
+            docker container restart bebastukar
