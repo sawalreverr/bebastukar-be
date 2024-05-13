@@ -29,10 +29,10 @@ func (h *discussionHandler) GetAllDiscussionFromProfile(c echo.Context) error {
 	}
 
 	if len(*discussions) == 0 {
-		return helper.ErrorHandler(c, http.StatusNotFound, "discussion empty")
+		return helper.ErrorHandler(c, http.StatusOK, "discussion empty")
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseData(http.StatusFound, "ok", discussions))
+	return c.JSON(http.StatusFound, helper.ResponseData(http.StatusFound, "ok", discussions))
 }
 
 func (h *discussionHandler) NewDiscussionHandler(c echo.Context) error {
