@@ -55,7 +55,7 @@ jobs:
             cd projects
             docker container stop bebastukar || true && docker container rm bebastukar || true
             docker container stop mysql-service || true && docker container rm mysql-service || true
-            rm config.yaml || true
+            mkdir /tmp/mysql-volume || true
 
             docker network create api-network || true
             docker image rm sawalrever23/bebastukar || true
@@ -66,6 +66,7 @@ jobs:
             -p 3306:3306 \
             -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
+            -v /tmp/mysql-volume:/var/lib/mysql
             mysql:latest
 
             docker run -itd --name bebastukar \

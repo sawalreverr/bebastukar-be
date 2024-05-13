@@ -32,7 +32,7 @@ func (h *discussionHandler) GetAllDiscussionFromProfile(c echo.Context) error {
 		return helper.ErrorHandler(c, http.StatusNotFound, "discussion empty")
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseData(http.StatusFound, "ok", discussions))
+	return c.JSON(http.StatusFound, helper.ResponseData(http.StatusFound, "ok", discussions))
 }
 
 func (h *discussionHandler) NewDiscussionHandler(c echo.Context) error {
