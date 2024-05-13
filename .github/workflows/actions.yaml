@@ -66,7 +66,7 @@ jobs:
             -p 3306:3306 \
             -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
-            -v /tmp/mysql-volume:/var/lib/mysql
+            -v /tmp/mysql-volume:/var/lib/mysql \
             mysql:latest
 
             docker run -itd --name bebastukar \
