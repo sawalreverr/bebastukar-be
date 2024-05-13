@@ -53,19 +53,20 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd projects
-            docker stop bebastukar || true && docker rm bebastukar || true
-            docker stop mysql-service || true && docker rm mysql-service || true
+            docker container stop bebastukar || true && docker container rm bebastukar || true
+            docker container stop mysql-service || true && docker container rm mysql-service || true
+            rm config.yaml || true
 
             docker network create api-network || true
-
-            docker images | grep -q mysql || docker pull mysql:latest
+            docker image rm sawalrever23/bebastukar || true
             docker pull sawalrever23/bebastukar:latest
 
-            docker run -itd --name mysql-service --network api-network -p 3306:3306 -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} mysql:latest
-            docker run -itd --name bebastukar -p 8080:8080 --network api-network sawalrever23/bebastukar:latest
-
-            sleep 15
-            docker exec -i mysql-service mysql -uroot -p${{ secrets.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS bebastukar_db;"
+            docker run -itd --name mysql-service \
+            --network api-network \
+            -p 3306:3306 \
+            -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
+            mysql:latest
 
             touch config.yaml
             echo "server:" >> config.yaml
@@ -83,6 +84,8 @@ jobs:
             echo "  apisecret: ${{ secrets.CLOUDINARY_APISECRET }}" >> config.yaml
             echo "generativeai:" >> config.yaml
             echo "  apikey: ${{ secrets.GENERATIVEAI_APIKEY }}" >> config.yaml
-            
+
+            docker run -itd --name bebastukar -p 8080:8080 --network api-network sawalrever23/bebastukar:latest
+
             docker cp config.yaml bebastukar:/config.yaml
             docker container restart bebastukar
