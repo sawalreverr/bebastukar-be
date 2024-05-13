@@ -68,6 +68,12 @@ jobs:
             -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
             mysql:latest
 
+            docker run -itd --name bebastukar \
+            -p 8080:8080 \
+            --network api-network \
+            --restart on-failure \
+            sawalrever23/bebastukar:latest
+
             touch config.yaml
             echo "server:" >> config.yaml
             echo "  port: 8080" >> config.yaml
@@ -84,8 +90,6 @@ jobs:
             echo "  apisecret: ${{ secrets.CLOUDINARY_APISECRET }}" >> config.yaml
             echo "generativeai:" >> config.yaml
             echo "  apikey: ${{ secrets.GENERATIVEAI_APIKEY }}" >> config.yaml
-
-            docker run -itd --name bebastukar -p 8080:8080 --network api-network sawalrever23/bebastukar:latest
 
             docker cp config.yaml bebastukar:/config.yaml
             docker container restart bebastukar
