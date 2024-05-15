@@ -79,3 +79,7 @@ Selain itu, pengguna dapat menambahkan postingan untuk barang bekas yang ingin m
 ![ERD - Picture](<docs/(ERD)%20Mini%20Project%20-%20BebasTukar.drawio.png>)
 
 [ERD - draw.io](https://drive.google.com/file/d/1njk9cH9IgRjSxqUGDRB2-1rVvhaYRWvo/view?usp=sharing)
+
+## Documentation
+
+[Postman API Collection](https://www.postman.com/sawalrever23/documentation/34865902-1d123c72-3abb-4d5e-96d3-be7023f3fce1)
